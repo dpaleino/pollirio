@@ -109,7 +109,7 @@ class MyBotFactory(protocol.ClientFactory):
 
 def main():
     log.startLogging(sys.stdout)
-    channel = "#polloaforno"
+    channel = "#polloalforno"
     reactor.connectTCP("calvino.freenode.net", 6667, MyBotFactory(channel))
     reactor.run()
 
