@@ -12,6 +12,10 @@ import time
 import re
 import sys
 
+from pollirio.modules.lart import *
+from pollirio.modules import run
+from pollirio import commands, get_command
+
 class Logger:
     def __init__(self, file):
         self.file = file
@@ -24,6 +28,12 @@ class Logger:
 
     def close(self):
         self.file.close()
+
+class IrcEvent:
+    def __init__(self, username, channel, msg):
+        self.nick = username
+        self.channel = channel
+        self.msg = msg
 
 class MyBot(irc.IRCClient):
     def _get_nickname(self):
@@ -51,12 +61,30 @@ class MyBot(irc.IRCClient):
     # callback
     def privmsg(self, user, channel, msg):
         user = user.split('!', 1)[0]
+        ievent = IrcEvent(user, channel, msg)
+        cmd = get_command(msg) if msg[0] == "." else None
 
         if channel == self.nickname:
             self.msg(user, "Moo, sono una mooocca!!!")
             return
+        elif channel == "*":
+            # this is a message from the server, temporarily just skip it
+            # TODO: maybe handle authentication here?
+            return
 
+        # execute the plugin if a command is passed
+        print repr(commands)
+        run(cmd, self, ievent)
+        print repr(commands)
+#        if cmd:
+#            try:
+#                commands[cmd](self, ievent)
+#            except KeyError:
+#                pass
+
+        print user, channel
         print "Message is:", msg
+
         self.logger.log("<%s> %s" % (user, msg))
 
     # callback
