@@ -40,6 +40,18 @@ class MyBot(irc.IRCClient):
         return self.factory.nickname
     nickname = property(_get_nickname)
 
+    # override IRCClient's methods, just to get them logged
+    def msg(self, channel, message):
+        # FIXME: use the configurable nick
+        irc.IRCClient.msg(self, channel, message)
+        if message.find("ACTION") == -1:
+            self.logger.log("<pollirio> %s" % message)
+
+    def describe(self, channel, message):
+        # FIXME: use the configurable nick
+        irc.IRCClient.describe(self, channel, message)
+        self.logger.log("* pollirio %s" % message)
+
     # callback
     def connectionMade(self):
         irc.IRCClient.connectionMade(self)
@@ -64,6 +76,7 @@ class MyBot(irc.IRCClient):
         ievent = IrcEvent(user, channel, msg)
         cmd = get_command(msg) if msg[0] == "." else None
 
+        print user, channel, msg
         if channel == self.nickname:
             self.msg(user, "Moo, sono una mooocca!!!")
             return
@@ -72,20 +85,10 @@ class MyBot(irc.IRCClient):
             # TODO: maybe handle authentication here?
             return
 
-        # execute the plugin if a command is passed
-        print repr(commands)
-        plugin_run(cmd, self, ievent)
-        print repr(commands)
-#        if cmd:
-#            try:
-#                commands[cmd](self, ievent)
-#            except KeyError:
-#                pass
-
-        print user, channel
-        print "Message is:", msg
-
         self.logger.log("<%s> %s" % (user, msg))
+
+        # execute the plugin if a command is passed
+        plugin_run(cmd, self, ievent)
 
     # callback
     def action(self, user, channel, msg):
