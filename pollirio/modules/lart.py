@@ -56,7 +56,7 @@ def lart(bot, ievent):
         return
 
     lart = lart.replace("$who", args[1]).encode("utf-8")
-    bot.me(ievent.channel, lart)
+    bot.describe(ievent.channel, lart)
     return
 
 @expose("lartami")
