@@ -22,3 +22,4 @@ def plugin_run(name, *args):
         return commands.get(name)(*args)
 
 from lart import *
+from polygen import *
