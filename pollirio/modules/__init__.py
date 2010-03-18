@@ -17,7 +17,7 @@ def expose(cmd):
         return fn
     return decorator
 
-def run(name, *args):
+def plugin_run(name, *args):
     if name in commands:
         return commands.get(name)(*args)
 

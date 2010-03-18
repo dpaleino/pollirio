@@ -13,7 +13,7 @@ import re
 import sys
 
 from pollirio.modules.lart import *
-from pollirio.modules import run
+from pollirio.modules import plugin_run
 from pollirio import commands, get_command
 
 class Logger:
@@ -74,7 +74,7 @@ class MyBot(irc.IRCClient):
 
         # execute the plugin if a command is passed
         print repr(commands)
-        run(cmd, self, ievent)
+        plugin_run(cmd, self, ievent)
         print repr(commands)
 #        if cmd:
 #            try:
