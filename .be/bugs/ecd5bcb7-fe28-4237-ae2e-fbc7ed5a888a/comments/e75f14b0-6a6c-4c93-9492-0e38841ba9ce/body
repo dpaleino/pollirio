@@ -1,0 +1,7 @@
+Nei plugin, dover maneggiare gli argomenti "a mano" e' una brutta cosa.
+Inoltre bisognerebbe controllare la mancanza o meno di un argomento.
+Esempio:
+
+<dapal> .popcon
+<pollirio> # mostra il messaggio di help di popcon
+
