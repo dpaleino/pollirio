@@ -23,3 +23,4 @@ def plugin_run(name, *args):
 
 from lart import *
 from polygen import *
+from bts import *
