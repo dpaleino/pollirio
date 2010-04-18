@@ -1,0 +1,32 @@
+Reporting bugs in pollirio
+==========================
+
+To manage bugreports, we use Bugs-Everywhere, a bugtracker built on 
+distributed revision control. On Debian systems, just apt-get install 
+it.
+
+The idea is to package the bug information with the source code, so that 
+bugs can be marked "fixed" in the branches/commits that fix them. So, 
+instead of numbers, bugs have ids, much like git revision hashes.
+
+To create bugs, use:
+
+  $ be new "DESCRIPTION"
+
+To comment on bugs, you can can use:
+
+  $ be comment BUG_ID
+
+You can see current bugs with
+
+  $ be list
+
+To close a bug, use
+
+  $ be close BUG_ID
+
+and be sure to commit the .be/ directory together with the code fixing 
+the bug.
+
+For more commands, see "be help".
+
