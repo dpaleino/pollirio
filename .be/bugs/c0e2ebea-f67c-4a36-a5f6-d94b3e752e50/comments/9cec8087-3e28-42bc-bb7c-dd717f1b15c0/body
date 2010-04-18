@@ -1,0 +1,4 @@
+Il codice network-related puo' essere lento (SOAP, parsing HTML, [..]), e 
+dovrebbe essere spostato in un thread separato cosi' da poter fornire le 
+altre funzioni nel frattempo.
+
