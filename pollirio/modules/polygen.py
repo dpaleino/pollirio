@@ -43,9 +43,8 @@ def fix_entities(str):
 
 @expose("poly")
 def poly(bot, ievent):
-    args = ievent.msg.split()
     try:
-        grammar = "%s/%s.grm" % (path, args[1])
+        grammar = "%s/%s.grm" % (path, ievent.args[0])
     except IndexError:
         grammar = None
 
@@ -58,7 +57,7 @@ def poly(bot, ievent):
             return
 
     if not os.path.exists(grammar):
-        bot.msg(ievent.channel, "%s: non ho la grammatica %s!" % (ievent.nick, args[1]))
+        bot.msg(ievent.channel, "%s: non ho la grammatica %s!" % (ievent.nick, ievent.args[0]))
         return
 
     try:

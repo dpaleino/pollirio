@@ -13,7 +13,7 @@ import re
 import sys
 
 from pollirio.modules.lart import *
-from pollirio.modules import plugin_run
+from pollirio.modules import plugin_run, check_args
 from pollirio import commands, get_command
 
 class Logger:
@@ -34,6 +34,7 @@ class IrcEvent:
         self.nick = username
         self.channel = channel
         self.msg = msg
+        self.args = self.msg.split()[1:]
 
 class MyBot(irc.IRCClient):
     def _get_nickname(self):

@@ -38,11 +38,11 @@ pseudo_packages = {
     'listarchives': 'Problems with the WWW mailing list archives',
 }
 
-@expose("bug")
+@expose("bug", 1)
 def bug(bot, ievent):
-    args = ievent.msg.split()
+    """bug <bugid>"""
     bts = debbugs()
-    b = bts.get(int(args[1]))
+    b = bts.get(int(ievent.args[0]))
 
     status = "(fixed) " if b.status == "done" else ""
     severity = "(%s) " % b.severity if b.severity != "normal" else ""
@@ -52,10 +52,10 @@ def bug(bot, ievent):
     msg = "%s %s%s- %s: %s" % (b.url, status, severity, b.package, b.summary)
     bot.msg(ievent.channel, "%s: %s" % (ievent.nick, msg.encode("utf-8")))
 
-@expose("qa")
+@expose("qa", 1)
 def qa(bot, ievent):
-    args = ievent.msg.split()
-    package = str(args[1])
+    """qa <package>"""
+    package = str(ievent.args[0])
 
     if package.startswith("lib"):
         prefix = package[:4]
@@ -74,10 +74,10 @@ def qa(bot, ievent):
 
     bot.msg(ievent.channel, msg.encode("utf-8"))
 
-@expose("maintainer")
+@expose("maintainer", 1)
 def maintainer(bot, ievent):
-    args = ievent.msg.split()
-    package = str(args[1])
+    """maintainer <package>"""
+    package = str(ievent.args[0])
 
     if package.startswith("lib"):
         prefix = package[:4]
@@ -109,12 +109,12 @@ def maintainer(bot, ievent):
         msg += ', '.join(tmp)
     bot.msg(ievent.channel, msg.encode("utf-8"))
 
-@expose("madison")
+@expose("madison", 1)
 def madison(bot, ievent):
-    args = ievent.msg.split()
-    package = str(args[1])
-    if len(args) > 2:
-        suites = ",".join(args[2:])
+    """madison <package> [package, package, ...]"""
+    package = str(ievent.args[0])
+    if len(ievent.args) > 1:
+        suites = ",".join(ievent.args[1:])
     else:
         suites = ""
 
@@ -128,10 +128,10 @@ def madison(bot, ievent):
     for l in f.readlines():
         bot.msg(ievent.channel, "%s: %s" % (ievent.nick, l.rstrip().encode("utf-8")))
 
-@expose("popcon")
+@expose("popcon", 1)
 def popcon(bot, ievent):
-    args = ievent.msg.split()
-    package = str(args[1])
+    """popcon <package>"""
+    package = str(ievent.args[0])
     data = urlencode({'package': package})
 
     try:

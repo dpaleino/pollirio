@@ -42,20 +42,21 @@ class LartsDb:
 
 larts = LartsDb()
 
-@expose("lart")
-@expose("larta")
+@expose("lart", 1)
+@expose("larta", 1)
 def lart(bot, ievent):
-    args = ievent.msg.split()
-    if len(args) == 2:
+    """lart <utente> [numero lart]"""
+
+    if len(ievent.args) == 1:
         lart = larts.random()
     else:
-        lart = larts.idlart(int(args[2]))
+        lart = larts.idlart(int(ievent.args[1]))
 
     if not lart:
         bot.msg(ievent.channel, "%s autolartati, non esiste quel lart!" % ievent.nick)
         return
 
-    lart = lart.replace("$who", args[1]).encode("utf-8")
+    lart = lart.replace("$who", ievent.args[0]).encode("utf-8")
     bot.describe(ievent.channel, lart)
     return
 
@@ -65,8 +66,9 @@ def selflart(bot, ievent):
     ievent.msg = ".lart %s" % ievent.nick
     lart(bot, ievent)
 
-@expose("lart-add")
+@expose("lart-add", 1)
 def lartadd(bot, ievent):
+    """lart-add <testo contenente $who>"""
     args = ievent.msg.split(" ", 1)
     if len(args) == 1:
         bot.msg(ievent.channel, "%s: cosa devo aggiungere?" % ievent.nick)
@@ -76,23 +78,24 @@ def lartadd(bot, ievent):
     bot.msg(ievent.channel, "%s: lart %s aggiunto." % (ievent.nick, id))
     return
 
-@expose("lart-del")
+@expose("lart-del", 1)
 def lartdel(bot, ievent):
-    args = ievent.msg.split(" ", 1)
-    if len(args) == 1:
+    """lart-del <id del lart>"""
+    if not ievent.args:
         bot.msg(ievent.channel, "%s: cosa devo cancellare?" % ievent.nick)
         return
 
-    id = int(args[1])
+    id = int(ievent.args[0])
     if larts.delete(id):
         bot.msg(ievent.channel, "%s: lart %s cancellato." % (ievent.nick, id))
     else:
         bot.msg(ievent.channel, "%s: impossibile cancellare lart %s." % (ievent.nick, id))
     return
 
-@expose("lart-search")
-@expose("sl")
+@expose("lart-search", 1)
+@expose("sl", 1)
 def lartsearch(bot, ievent):
+    """lart-search <query>"""
     args = ievent.msg.split(" ", 1)
     if len(args) == 1:
         bot.msg(ievent.channel, "%s: cosa devo cercare?" % ievent.nick)
