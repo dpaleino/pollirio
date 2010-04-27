@@ -1,35 +1,5 @@
-
-
-
 creator=David Paleino <dapal@debian.org>
-
-
-
-
-
-
 severity=minor
-
-
-
-
-
-
 status=open
-
-
-
-
-
-
 summary=Spostare tutto il codice network-related in thread separati
-
-
-
-
-
-
 time=Sun, 18 Apr 2010 15:58:28 +0000
-
-
-
