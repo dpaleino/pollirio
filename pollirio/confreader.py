@@ -5,6 +5,8 @@ class ConfReader(object):
         defaults = {
             'nick': 'pollirio',
             'channel': '#polloalforno',
+            'server_addr': 'calvino.freenode.net',
+            'server_port': 6667
         }
         self.__slots__ = defaults.keys()
         config = SafeConfigParser(defaults)
