@@ -14,6 +14,7 @@ import sys
 
 from pollirio.modules.lart import *
 from pollirio.modules import plugin_run, check_args
+from pollirio.confreader import ConfReader
 from pollirio import commands, get_command
 
 class Logger:
@@ -57,13 +58,13 @@ class MyBot(irc.IRCClient):
     def connectionMade(self):
         irc.IRCClient.connectionMade(self)
         self.logger = Logger(open(self.factory.logfile, "a"))
-        self.logger.log("[connected at %s]" % 
+        self.logger.log("[connected at %s]" %
                         time.asctime(time.localtime(time.time())))
 
     # callback
     def connectionLost(self, reason):
         irc.IRCClient.connectionLost(self, reason)
-        self.logger.log("[disconnected at %s]" % 
+        self.logger.log("[disconnected at %s]" %
                         time.asctime(time.localtime(time.time())))
         self.logger.close()
 
@@ -141,8 +142,9 @@ class MyBotFactory(protocol.ClientFactory):
 
 def main():
     log.startLogging(sys.stdout)
-    channel = "#polloalforno"
-    reactor.connectTCP("calvino.freenode.net", 6667, MyBotFactory(channel))
+    conf = ConfReader('pollirio.ini')
+
+    reactor.connectTCP(conf.server_addr, conf.server_port, MyBotFactory(conf.channel))
     reactor.run()
 
 if __name__ == "__main__":
