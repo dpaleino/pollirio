@@ -90,7 +90,8 @@ class MyBot(irc.IRCClient):
         self.logger.log("<%s> %s" % (user, msg))
 
         # execute the plugin if a command is passed
-        plugin_run(cmd, self, ievent)
+        if cmd and check_args(cmd, self, ievent):
+            plugin_run(cmd, self, ievent)
 
     # callback
     def action(self, user, channel, msg):
