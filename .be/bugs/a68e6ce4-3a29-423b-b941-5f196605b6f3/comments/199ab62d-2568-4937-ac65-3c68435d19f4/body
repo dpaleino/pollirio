@@ -1,0 +1,8 @@
+il bot attuale non permette quote molto lunghi. si potrebbe implementare un
+plugin di quote che invia il quote a pezzi se è troppo lungo per essere inviato
+in una sola volta (c'è già una cosa simile, ma comunque limita la lunghezza
+massima del quote a una "riga" e mezza). Questo però potrebbe risultare in
+flooding se il quote è davvero troppo lungo (caso raro e gli user che possono
+aggiungere i quote sono autenticati, ma per sicurezza....) quindi si potrebbe
+fare un controllo dove se il quote è più di N "righe" (per esempio possiamo
+dire N = 2 o 3) il bot fa il paste su pastebin e pasta solo l'url.
