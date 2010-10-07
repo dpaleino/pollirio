@@ -80,7 +80,7 @@ class MyBot(irc.IRCClient):
 
     # callback
     def signedOn(self):
-        self.msg('NickServ', 'identify %s' % conf.password)
+        self.msg(IrcEvent('NickServ', None, ''), 'identify %s' % conf.password)
         self.join(self.factory.channel)
 
     # callback
