@@ -68,8 +68,7 @@ def lart(bot, ievent):
 @expose("lartami")
 @expose("autolart")
 def selflart(bot, ievent):
-    ievent.msg = ".lart %s" % ievent.nick
-    ievent.args = ievent.msg.split()[1:]
+    ievent.args = [ievent.nick] + ievent.msg.split()[1:]
     lart(bot, ievent)
 
 @expose("lart-add", 1)
