@@ -82,7 +82,7 @@ class MyBot(irc.IRCClient):
         cmd = get_command(msg) if msg[0] == "." else None
 
         print user, channel, msg
-        if channel == self.nickname:
+        if channel == self.nickname and user != 'NickServ':
             self.msg(user, "Moo, sono una mooocca!!!")
             return
         elif channel == "*":
