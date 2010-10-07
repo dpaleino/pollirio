@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from pollirio.modules import expose
+from pollirio.main import conf
 from pollirio.dbutils import *
 
 import random
@@ -107,7 +108,10 @@ def lartsearch(bot, ievent):
 
     query = args[1]
     for id, lart in larts.search(query):
-        bot.msg(ievent.channel, "#%s: %s" % (id, lart.encode("utf-8")))
+        if ievent.channel == conf.nickname:
+            bot.msg(ievent.nick, "#%s: %s" % (id, lart.encode("utf-8")))
+        else:
+            bot.msg(ievent.channel, "#%s: %s" % (id, lart.encode("utf-8")))
         time.sleep(0.75)
     return
 
