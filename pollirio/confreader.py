@@ -4,9 +4,10 @@ class ConfReader(object):
     def __init__(self, fn):
         defaults = {
             'nickname': 'pollirio',
+            'password': '',
             'channel': '#polloalforno',
             'server_addr': 'calvino.freenode.net',
-            'server_port': 6667
+            'server_port': 6667,
         }
         self.__slots__ = defaults.keys()
         config = SafeConfigParser(defaults)

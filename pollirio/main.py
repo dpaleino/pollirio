@@ -17,6 +17,8 @@ from pollirio.modules import plugin_run, check_args
 from pollirio.confreader import ConfReader
 from pollirio import commands, get_command
 
+conf = ConfReader('pollirio.ini')
+
 class Logger:
     def __init__(self, file):
         self.file = file
@@ -70,6 +72,7 @@ class MyBot(irc.IRCClient):
 
     # callback
     def signedOn(self):
+        self.msg('NickServ', 'identify %s' % conf.password)
         self.join(self.factory.channel)
 
     # callback
@@ -143,7 +146,6 @@ class MyBotFactory(protocol.ClientFactory):
 
 def main():
     log.startLogging(sys.stdout)
-    conf = ConfReader('pollirio.ini')
 
     reactor.connectTCP(conf.server_addr, conf.server_port, MyBotFactory(conf.channel, conf.nickname))
     reactor.run()
