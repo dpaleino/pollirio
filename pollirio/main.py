@@ -145,7 +145,7 @@ def main():
     log.startLogging(sys.stdout)
     conf = ConfReader('pollirio.ini')
 
-    reactor.connectTCP(conf.server_addr, conf.server_port, MyBotFactory(conf.channel))
+    reactor.connectTCP(conf.server_addr, conf.server_port, MyBotFactory(conf.channel, conf.nickname))
     reactor.run()
 
 if __name__ == "__main__":
