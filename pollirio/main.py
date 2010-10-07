@@ -12,7 +12,6 @@ import time
 import re
 import sys
 
-from pollirio.modules.lart import *
 from pollirio.modules import plugin_run, check_args
 from pollirio.confreader import ConfReader
 from pollirio import commands, get_command
@@ -45,16 +44,25 @@ class MyBot(irc.IRCClient):
     nickname = property(_get_nickname)
 
     # override IRCClient's methods, just to get them logged
-    def msg(self, channel, message):
-        # FIXME: use the configurable nick
-        irc.IRCClient.msg(self, channel, message)
+    def msg(self, ievent, message):
+        if ievent.channel == conf.nickname:
+            # if the channel == our nickname, it means we're in a query,
+            # therefore the message should be sent to the sender.
+            dest = ievent.nick
+        else:
+            dest = ievent.channel
+        irc.IRCClient.msg(self, dest, message)
         if message.find("ACTION") == -1:
-            self.logger.log("<pollirio> %s" % message)
+            self.logger.log("<%s> %s" % (conf.nickname, message))
 
-    def describe(self, channel, message):
-        # FIXME: use the configurable nick
-        irc.IRCClient.describe(self, channel, message)
-        self.logger.log("* pollirio %s" % message)
+    def describe(self, ievent, message):
+        if ievent.channel == conf.nickname:
+            # see comment in msg()
+            dest = ievent.nick
+        else:
+            dest = ievent.channel
+        irc.IRCClient.describe(self, dest, message)
+        self.logger.log("* %s %s" % (conf.nickname, message))
 
     # callback
     def connectionMade(self):

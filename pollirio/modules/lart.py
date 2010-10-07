@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from pollirio.modules import expose
-from pollirio.main import conf
 from pollirio.dbutils import *
+from pollirio.confreader import ConfReader
 
 import random
 import time
 import exceptions
+
+conf = ConfReader('pollirio.ini')
 
 class LartsDb:
     def __init__(self):
@@ -58,11 +60,11 @@ def lart(bot, ievent):
             lart = larts.random()
 
     if not lart:
-        bot.msg(ievent.channel, "%s autolartati, non esiste quel lart!" % ievent.nick)
+        bot.msg(ievent, "%s autolartati, non esiste quel lart!" % ievent.nick)
         return
 
     lart = lart.replace("$who", ievent.args[0]).encode("utf-8")
-    bot.describe(ievent.channel, lart)
+    bot.describe(ievent, lart)
     return
 
 @expose("lartami")
@@ -76,25 +78,25 @@ def lartadd(bot, ievent):
     """lart-add <testo contenente $who>"""
     args = ievent.msg.split(" ", 1)
     if len(args) == 1:
-        bot.msg(ievent.channel, "%s: cosa devo aggiungere?" % ievent.nick)
+        bot.msg(ievent, "%s: cosa devo aggiungere?" % ievent.nick)
         return
 
     id = larts.add(args[1])
-    bot.msg(ievent.channel, "%s: lart %s aggiunto." % (ievent.nick, id))
+    bot.msg(ievent, "%s: lart %s aggiunto." % (ievent.nick, id))
     return
 
 @expose("lart-del", 1)
 def lartdel(bot, ievent):
     """lart-del <id del lart>"""
     if not ievent.args:
-        bot.msg(ievent.channel, "%s: cosa devo cancellare?" % ievent.nick)
+        bot.msg(ievent, "%s: cosa devo cancellare?" % ievent.nick)
         return
 
     id = int(ievent.args[0])
     if larts.delete(id):
-        bot.msg(ievent.channel, "%s: lart %s cancellato." % (ievent.nick, id))
+        bot.msg(ievent, "%s: lart %s cancellato." % (ievent.nick, id))
     else:
-        bot.msg(ievent.channel, "%s: impossibile cancellare lart %s." % (ievent.nick, id))
+        bot.msg(ievent, "%s: impossibile cancellare lart %s." % (ievent.nick, id))
     return
 
 @expose("lart-search", 1)
@@ -103,19 +105,16 @@ def lartsearch(bot, ievent):
     """lart-search <query>"""
     args = ievent.msg.split(" ", 1)
     if len(args) == 1:
-        bot.msg(ievent.channel, "%s: cosa devo cercare?" % ievent.nick)
+        bot.msg(ievent, "%s: cosa devo cercare?" % ievent.nick)
         return
 
     query = args[1]
     for id, lart in larts.search(query):
-        if ievent.channel == conf.nickname:
-            bot.msg(ievent.nick, "#%s: %s" % (id, lart.encode("utf-8")))
-        else:
-            bot.msg(ievent.channel, "#%s: %s" % (id, lart.encode("utf-8")))
+        bot.msg(ievent, "#%s: %s" % (id, lart.encode("utf-8")))
         time.sleep(0.75)
     return
 
 @expose("lart-size")
 def lartsize(bot, ievent):
-    bot.msg(ievent.channel, "%s: al momento conosco %s lart." % (ievent.nick, larts.size()))
+    bot.msg(ievent, "%s: al momento conosco %s lart." % (ievent.nick, larts.size()))
     return

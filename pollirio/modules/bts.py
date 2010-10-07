@@ -50,7 +50,7 @@ def bug(bot, ievent):
     #msg = colourise("[bug]#%s[reset]%s: %s: «[title]%s[reset]»%s [url]%s[reset]" % (b.bug, status, package, b.summary, severity, b.url)).decode("utf-8")
     #msg = "#%s%s: %s: %s%s %s" % (b.bug, status, b.package, b.summary, severity, b.url)
     msg = "%s %s%s- %s: %s" % (b.url, status, severity, b.package, b.summary)
-    bot.msg(ievent.channel, "%s: %s" % (ievent.nick, msg.encode("utf-8")))
+    bot.msg(ievent, "%s: %s" % (ievent.nick, msg.encode("utf-8")))
 
 @expose("qa", 1)
 def qa(bot, ievent):
@@ -72,7 +72,7 @@ def qa(bot, ievent):
         else:
             msg = "%s: %s" % (ievent.nick, e.msg)
 
-    bot.msg(ievent.channel, msg.encode("utf-8"))
+    bot.msg(ievent, msg.encode("utf-8"))
 
 @expose("maintainer", 1)
 def maintainer(bot, ievent):
@@ -92,7 +92,7 @@ def maintainer(bot, ievent):
             msg = "%s: package %s does not exist" % (ievent.nick, package)
         else:
             msg = "%s: %s" % (ievent.nick, e.msg)
-        bot.msg(ievent.channel, msg.encode("utf-8"))
+        bot.msg(ievent, msg.encode("utf-8"))
         return
 
     msg = "%s: maintainer for %s is " % (ievent.nick, package)
@@ -107,7 +107,7 @@ def maintainer(bot, ievent):
         for u in uploaders:
             tmp.append("%s <%s>" % (u.string, u.parent['href'].split('login=')[1]))
         msg += ', '.join(tmp)
-    bot.msg(ievent.channel, msg.encode("utf-8"))
+    bot.msg(ievent, msg.encode("utf-8"))
 
 @expose("madison", 1)
 def madison(bot, ievent):
@@ -126,7 +126,7 @@ def madison(bot, ievent):
 
     f = urlopen('http://qa.debian.org/madison.php?%s' % data)
     for l in f.readlines():
-        bot.msg(ievent.channel, "%s: %s" % (ievent.nick, l.rstrip().encode("utf-8")))
+        bot.msg(ievent, "%s: %s" % (ievent.nick, l.rstrip().encode("utf-8")))
 
 @expose("popcon", 1)
 def popcon(bot, ievent):
@@ -141,7 +141,7 @@ def popcon(bot, ievent):
             msg = "%s: package %s does not exist" % (ievent.nick, package)
         else:
             msg = "%s: %s" % (ievent.nick, e.msg)
-        bot.msg(ievent.channel, msg.encode("utf-8"))
+        bot.msg(ievent, msg.encode("utf-8"))
         return
 
     soup = BeautifulSoup(f)
@@ -158,4 +158,4 @@ def popcon(bot, ievent):
     for f in fields:
         msg += "%s: %d " % (f, fields[f])
     msg += "- http://qa.debian.org/developer.php?popcon=%s" % package
-    bot.msg(ievent.channel, msg.encode("utf-8"))
+    bot.msg(ievent, msg.encode("utf-8"))
