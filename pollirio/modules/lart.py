@@ -50,7 +50,10 @@ def lart(bot, ievent):
     if len(ievent.args) == 1:
         lart = larts.random()
     else:
-        lart = larts.idlart(int(ievent.args[1]))
+        try:
+            lart = larts.idlart(int(ievent.args[1]))
+        except ValueError:
+            lart = larts.random()
 
     if not lart:
         bot.msg(ievent.channel, "%s autolartati, non esiste quel lart!" % ievent.nick)
