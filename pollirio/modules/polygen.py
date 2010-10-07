@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from pollirio.modules import expose
+from pollirio import choose_dest
 
 import re
 import random
@@ -53,19 +54,19 @@ def poly(bot, ievent):
             avail_grammars = glob("%s/*.grm" % path)
             grammar = random.choice(avail_grammars)
         except IndexError:
-            bot.msg(ievent.channel, "%s: nessuna grammatica disponibile! polygen-data è installato?" % ievent.nick)
+            bot.msg(choose_dest(ievent), "%s: nessuna grammatica disponibile! polygen-data è installato?" % ievent.nick)
             return
 
     if not os.path.exists(grammar):
-        bot.msg(ievent.channel, "%s: non ho la grammatica %s!" % (ievent.nick, ievent.args[0]))
+        bot.msg(choose_dest(ievent), "%s: non ho la grammatica %s!" % (ievent.nick, ievent.args[0]))
         return
 
     try:
         p = Popen(["polygen", grammar], stdout=PIPE)
         reply = " ".join(filter(lambda x: x, p.communicate())).replace("\n", " ").strip()
-        bot.msg(ievent.channel, "%s: %s" % (ievent.nick, trunc(strip_tags(reply))))
+        bot.msg(choose_dest(ievent), "%s: %s" % (ievent.nick, trunc(strip_tags(reply))))
     except:
-        bot.msg(ievent.channel, "%s: non posso dirti nulla di nuovo, c'è stato un errore..." % ievent.nick)
+        bot.msg(choose_dest(ievent), "%s: non posso dirti nulla di nuovo, c'è stato un errore..." % ievent.nick)
         raise
         return
 
@@ -78,7 +79,7 @@ def polylist(bot, ievent):
             tmp.append(os.path.basename(g).replace(".grm", ""))
         grammars = sorted(tmp)
     except IndexError:
-        bot.msg(ievent.channel, "%s: nessuna grammatica disponibile! polygen-data è installato?" % ievent.nick)
+        bot.msg(choose_dest(ievent), "%s: nessuna grammatica disponibile! polygen-data è installato?" % ievent.nick)
         return
 
-    bot.msg(ievent.channel, "%s: conosco queste grammatiche: %s" % (ievent.nick, " ".join(grammars)))
+    bot.msg(choose_dest(ievent), "%s: conosco queste grammatiche: %s" % (ievent.nick, " ".join(grammars)))
