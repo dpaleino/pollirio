@@ -100,6 +100,8 @@ class MyBot(irc.IRCClient):
         if user == 'NickServ' or channel == "*":
             # this is a message from the server, temporarily just skip it
             # TODO: maybe handle authentication here?
+            if "temporary unavailable" in msg and conf.nickname in msg:
+                self.msg(IrcEvent('NickServ', None, ''), 'release %s %s' % (conf.nickname, conf.password))
             return
 
         self.logger.log("<%s> %s" % (user, msg))
