@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from pollirio.modules import expose
-from pollirio.main import conf
 from pollirio.dbutils import *
+from pollirio import choose_dest
 
 import random
 import time
@@ -76,11 +76,11 @@ def lartadd(bot, ievent):
     """lart-add <testo contenente $who>"""
     args = ievent.msg.split(" ", 1)
     if len(args) == 1:
-        bot.msg(ievent.channel, "%s: cosa devo aggiungere?" % ievent.nick)
+        bot.msg(choose_dest(ievent), "%s: cosa devo aggiungere?" % ievent.nick)
         return
 
     id = larts.add(args[1])
-    bot.msg(ievent.channel, "%s: lart %s aggiunto." % (ievent.nick, id))
+    bot.msg(choose_dest(ievent), "%s: lart %s aggiunto." % (ievent.nick, id))
     return
 
 @expose("lart-del", 1)
@@ -92,9 +92,9 @@ def lartdel(bot, ievent):
 
     id = int(ievent.args[0])
     if larts.delete(id):
-        bot.msg(ievent.channel, "%s: lart %s cancellato." % (ievent.nick, id))
+        bot.msg(choose_dest(ievent), "%s: lart %s cancellato." % (ievent.nick, id))
     else:
-        bot.msg(ievent.channel, "%s: impossibile cancellare lart %s." % (ievent.nick, id))
+        bot.msg(choose_dest(ievent), "%s: impossibile cancellare lart %s." % (ievent.nick, id))
     return
 
 @expose("lart-search", 1)
@@ -103,19 +103,16 @@ def lartsearch(bot, ievent):
     """lart-search <query>"""
     args = ievent.msg.split(" ", 1)
     if len(args) == 1:
-        bot.msg(ievent.channel, "%s: cosa devo cercare?" % ievent.nick)
+        bot.msg(choose_dest(ievent), "%s: cosa devo cercare?" % ievent.nick)
         return
 
     query = args[1]
     for id, lart in larts.search(query):
-        if ievent.channel == conf.nickname:
-            bot.msg(ievent.nick, "#%s: %s" % (id, lart.encode("utf-8")))
-        else:
-            bot.msg(ievent.channel, "#%s: %s" % (id, lart.encode("utf-8")))
+        bot.msg(choose_dest(ievent), "#%s: %s" % (id, lart.encode("utf-8")))
         time.sleep(0.75)
     return
 
 @expose("lart-size")
 def lartsize(bot, ievent):
-    bot.msg(ievent.channel, "%s: al momento conosco %s lart." % (ievent.nick, larts.size()))
+    bot.msg(choose_dest(ievent), "%s: al momento conosco %s lart." % (ievent.nick, larts.size()))
     return

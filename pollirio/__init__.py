@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from confreader import ConfReader
+
+conf = ConfReader('pollirio.ini')
+commands = {}
+
 def get_command(msg):
     # FIXME: allow a configurable control-character
     if msg[0] == '.':
@@ -7,4 +12,9 @@ def get_command(msg):
     else:
         return msg.split()[0]
 
-commands = {}
+def choose_dest(ievent):
+    if ievent.channel == conf.nickname:
+        return ievent.nick
+    else:
+        return ievent.channel
+

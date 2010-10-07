@@ -14,10 +14,8 @@ import sys
 
 from pollirio.modules.lart import *
 from pollirio.modules import plugin_run, check_args
-from pollirio.confreader import ConfReader
 from pollirio import commands, get_command
-
-conf = ConfReader('pollirio.ini')
+from pollirio import conf
 
 class Logger:
     def __init__(self, file):
@@ -72,7 +70,7 @@ class MyBot(irc.IRCClient):
 
     # callback
     def signedOn(self):
-        self.msg(IrcEvent('NickServ', None, ''), 'identify %s' % conf.password)
+        self.msg('NickServ', 'identify %s %s' % (conf.nickname, conf.password))
         self.join(self.factory.channel)
 
     # callback
@@ -89,11 +87,10 @@ class MyBot(irc.IRCClient):
                 cmd = None
 
         print user, channel, msg
-        if user == 'NickServ' or channel == "*":
-            # this is a message from the server, temporarily just skip it
-            # TODO: maybe handle authentication here?
-            if "temporary unavailable" in msg and conf.nickname in msg:
-                self.msg(IrcEvent('NickServ', None, ''), 'release %s %s' % (conf.nickname, conf.password))
+        if user == "NickServ" or channel == "*":
+#            # TODO: check whether it really works this way
+#            if "unavailable" in msg:
+#                self.msg('NickServ', 'release %s %s' % (conf.nickname, conf.password))
             return
 
         self.logger.log("<%s> %s" % (user, msg))
