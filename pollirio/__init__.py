@@ -2,6 +2,9 @@
 
 def get_command(msg):
     # FIXME: allow a configurable control-character
-    return msg.split()[0][1:]
+    if msg[0] == '.':
+        return msg.split()[0][1:]
+    else:
+        return msg.split()[0]
 
 commands = {}

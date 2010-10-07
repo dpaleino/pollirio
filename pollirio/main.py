@@ -79,13 +79,17 @@ class MyBot(irc.IRCClient):
     def privmsg(self, user, channel, msg):
         user = user.split('!', 1)[0]
         ievent = IrcEvent(user, channel, msg)
-        cmd = get_command(msg) if msg[0] == "." else None
+
+        if msg[0] == '.':
+            cmd = get_command(msg)
+        else:
+            if channel == self.nickname:
+                cmd = get_command(msg)
+            else:
+                cmd = None
 
         print user, channel, msg
-        if channel == self.nickname and user != 'NickServ':
-            self.msg(user, "Moo, sono una mooocca!!!")
-            return
-        elif channel == "*":
+        if user == 'NickServ' or channel == "*":
             # this is a message from the server, temporarily just skip it
             # TODO: maybe handle authentication here?
             return
