@@ -3,7 +3,7 @@ from ConfigParser import SafeConfigParser
 class ConfReader(object):
     def __init__(self, fn):
         defaults = {
-            'nick': 'pollirio',
+            'nickname': 'pollirio',
             'channel': '#polloalforno',
             'server_addr': 'calvino.freenode.net',
             'server_port': 6667
