@@ -53,19 +53,19 @@ def poly(bot, ievent):
             avail_grammars = glob("%s/*.grm" % path)
             grammar = random.choice(avail_grammars)
         except IndexError:
-            bot.msg(ievent, "%s: nessuna grammatica disponibile! polygen-data è installato?" % ievent.nick)
+            bot.msg(ievent.channel, "%s: nessuna grammatica disponibile! polygen-data è installato?" % ievent.nick)
             return
 
     if not os.path.exists(grammar):
-        bot.msg(ievent, "%s: non ho la grammatica %s!" % (ievent.nick, ievent.args[0]))
+        bot.msg(ievent.channel, "%s: non ho la grammatica %s!" % (ievent.nick, ievent.args[0]))
         return
 
     try:
         p = Popen(["polygen", grammar], stdout=PIPE)
         reply = " ".join(filter(lambda x: x, p.communicate())).replace("\n", " ").strip()
-        bot.msg(ievent, "%s: %s" % (ievent.nick, trunc(strip_tags(reply))))
+        bot.msg(ievent.channel, "%s: %s" % (ievent.nick, trunc(strip_tags(reply))))
     except:
-        bot.msg(ievent, "%s: non posso dirti nulla di nuovo, c'è stato un errore..." % ievent.nick)
+        bot.msg(ievent.channel, "%s: non posso dirti nulla di nuovo, c'è stato un errore..." % ievent.nick)
         raise
         return
 
@@ -78,7 +78,7 @@ def polylist(bot, ievent):
             tmp.append(os.path.basename(g).replace(".grm", ""))
         grammars = sorted(tmp)
     except IndexError:
-        bot.msg(ievent, "%s: nessuna grammatica disponibile! polygen-data è installato?" % ievent.nick)
+        bot.msg(ievent.channel, "%s: nessuna grammatica disponibile! polygen-data è installato?" % ievent.nick)
         return
 
-    bot.msg(ievent, "%s: conosco queste grammatiche: %s" % (ievent.nick, " ".join(grammars)))
+    bot.msg(ievent.channel, "%s: conosco queste grammatiche: %s" % (ievent.nick, " ".join(grammars)))
