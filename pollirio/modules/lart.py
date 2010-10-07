@@ -5,6 +5,7 @@ from pollirio.dbutils import *
 
 import random
 import time
+import exceptions
 
 class LartsDb:
     def __init__(self):
@@ -52,7 +53,7 @@ def lart(bot, ievent):
     else:
         try:
             lart = larts.idlart(int(ievent.args[1]))
-        except ValueError:
+        except exceptions.ValueError:
             lart = larts.random()
 
     if not lart:
