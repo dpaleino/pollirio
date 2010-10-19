@@ -75,6 +75,10 @@ def selflart(bot, ievent):
 def lartadd(bot, ievent):
     """lart-add <testo contenente $who>"""
     args = ievent.msg.split(" ", 1)
+    if ievent.nick != 'dapal':
+        bot.msg(choose_dest(ievent), '%s: solo dapal PUÒ.' % ievent.nick)
+        return
+
     if len(args) == 1:
         bot.msg(choose_dest(ievent), "%s: cosa devo aggiungere?" % ievent.nick)
         return
@@ -86,6 +90,10 @@ def lartadd(bot, ievent):
 @expose("lart-del", 1)
 def lartdel(bot, ievent):
     """lart-del <id del lart>"""
+    if ievent.nick != 'dapal':
+        bot.msg(choose_dest(ievent), '%s: solo dapal PUÒ.' % ievent.nick)
+        return
+
     if not ievent.args:
         bot.msg(ievent.channel, "%s: cosa devo cancellare?" % ievent.nick)
         return
