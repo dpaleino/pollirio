@@ -33,7 +33,7 @@ class LartsDb:
             return rs
 
     def add(self, lart):
-        rs = run(self.db.insert({"lart": lart}))
+        rs = run(self.db.insert({"lart": unicode(lart, 'utf-8')}))
         return rs.last_inserted_ids()[0]
 
     def delete(self, id):
