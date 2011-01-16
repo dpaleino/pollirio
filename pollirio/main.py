@@ -32,7 +32,11 @@ class Logger:
 
 class IrcEvent:
     def __init__(self, username, channel, msg):
-        self.nick = username
+        try:
+            self.nick, self.host = username.split('!', 1)
+        except ValueError:
+            self.nick, self.host = (username, username)
+        self.user = username
         self.channel = channel
         self.msg = msg
         self.args = self.msg.split()[1:]
@@ -75,7 +79,6 @@ class MyBot(irc.IRCClient):
 
     # callback
     def privmsg(self, user, channel, msg):
-        user = user.split('!', 1)[0]
         ievent = IrcEvent(user, channel, msg)
 
         if msg[0] == '.':
@@ -86,7 +89,7 @@ class MyBot(irc.IRCClient):
             else:
                 cmd = None
 
-        print user, channel, msg
+        print ievent.user, channel, msg
         if user == "NickServ" or channel == "*":
 #            # TODO: check whether it really works this way
 #            if "unavailable" in msg:

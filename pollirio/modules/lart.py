@@ -4,6 +4,7 @@ from pollirio.modules import expose
 from pollirio.dbutils import *
 from pollirio import choose_dest
 
+import re
 import random
 import time
 import exceptions
@@ -56,6 +57,10 @@ def lart(bot, ievent):
             lart = larts.idlart(int(ievent.args[1]))
         except exceptions.ValueError:
             lart = larts.random()
+
+    if re.match('.*!.*@unaffiliated/damn3dg1rl', ievent.host) or \
+       ievent.nick == 'DAMN3dg1rl':
+       ievent.args[0] = ievent.nick
 
     if not lart:
         bot.msg(ievent.channel, "%s autolartati, non esiste quel lart!" % ievent.nick)
