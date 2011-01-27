@@ -51,7 +51,7 @@ class LartIgnoreDb:
         r = run(self.db.select(and_( \
             self.db.c.src.like("%%%s%%" % src), \
             self.db.c.dst.like("%%%s%%" % dst)
-        )).fetchall()
+        ))).fetchall()
         if r:
             return True
         return False
