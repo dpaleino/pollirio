@@ -43,8 +43,6 @@ class LartsDb:
             return 1
         return 0
 
-larts = LartsDb()
-
 class LartIgnoreDb:
     def __init__(self):
         self.db = db_init("lartignore")
@@ -68,7 +66,8 @@ class LartIgnoreDb:
 #            return 1
 #        return 0
 
-ignores = LartIgnoreDB()
+larts = LartsDb()
+ignores = LartIgnoreDb()
 
 @expose("lart", 1)
 @expose("larta", 1)
