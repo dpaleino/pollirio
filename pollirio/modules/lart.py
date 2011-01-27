@@ -45,10 +45,39 @@ class LartsDb:
 
 larts = LartsDb()
 
+class LartIgnoreDb:
+    def __init__(self):
+        self.db = db_init("lartignore")
+
+    def ignored(self, src, dst):
+        r = run(self.db.select(
+            self.db.c.src.like("%s" % src) and \
+            self.db.c.dst.like("%s" % dst)
+        )).fetchall()
+        if r:
+            return True
+        return False
+
+    def add(self, src, dst):
+        rs = run(self.db.insert({"src": src, "dst": dst}))
+        return rs.last_inserted_ids()[0]
+
+#    def delete(self, id):
+#        if run(self.db.select(self.db.c.indx == id)).fetchone():
+#            run(self.db.delete(self.db.c.indx == id))
+#            return 1
+#        return 0
+
+ignores = LartIgnoreDB()
+
 @expose("lart", 1)
 @expose("larta", 1)
 def lart(bot, ievent):
     """lart <utente> [numero lart]"""
+
+    if len(ievent.args):
+        if ignores.ignored(ievent.nick, ievent.args[0]):
+            return
 
     if len(ievent.args) == 1:
         lart = larts.random()
@@ -68,6 +97,15 @@ def lart(bot, ievent):
 
     lart = lart.replace("$who", ievent.args[0]).encode("utf-8")
     bot.describe(ievent.channel, lart)
+    return
+
+@expose("lartignore", 1)
+def lartignore(bot, ievent):
+    """lartignore <utente>"""
+
+    if len(ievent.args):
+        ignore.add(ievent.args[0], ievent.nick)
+        bot.msg(choose_dest(ievent), '%s: cot' % ievent.nick)
     return
 
 @expose("lartami")
