@@ -48,8 +48,8 @@ class LartIgnoreDb:
         self.db = db_init("lartignore")
 
     def ignored(self, src, dst):
-        r = run(self.db.select(
-            self.db.c.src.like("%%%s%%" % src) and \
+        r = run(self.db.select(and_( \
+            self.db.c.src.like("%%%s%%" % src), \
             self.db.c.dst.like("%%%s%%" % dst)
         )).fetchall()
         if r:
@@ -61,9 +61,10 @@ class LartIgnoreDb:
         return rs.last_inserted_ids()[0]
 
     def delete(self, src, dst):
-        r = run(self.db.delete().where( \
-            (self.db.c.src == src) & (self.db.c.dst == dst) \
-        ).fetchone()
+        r = run(self.db.delete().where(and_( \
+            (self.db.c.src == src),
+            (self.db.c.dst == dst) \
+        ))).fetchone()
         if r:
             return 1
         return 0
