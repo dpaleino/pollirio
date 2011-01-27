@@ -49,8 +49,8 @@ class LartIgnoreDb:
 
     def ignored(self, src, dst):
         r = run(self.db.select(
-            self.db.c.src.like("%s" % src) and \
-            self.db.c.dst.like("%s" % dst)
+            self.db.c.src.like("%%%s%%" % src) and \
+            self.db.c.dst.like("%%%s%%" % dst)
         )).fetchall()
         if r:
             return True
@@ -60,11 +60,13 @@ class LartIgnoreDb:
         rs = run(self.db.insert({"src": src, "dst": dst}))
         return rs.last_inserted_ids()[0]
 
-#    def delete(self, id):
-#        if run(self.db.select(self.db.c.indx == id)).fetchone():
-#            run(self.db.delete(self.db.c.indx == id))
-#            return 1
-#        return 0
+    def delete(self, src, dst):
+        r = run(self.db.delete().where( \
+            (self.db.c.src == src) & (self.db.c.dst == dst) \
+        ).fetchone()
+        if r:
+            return 1
+        return 0
 
 larts = LartsDb()
 ignores = LartIgnoreDb()
@@ -103,7 +105,16 @@ def lartignore(bot, ievent):
     """lartignore <utente>"""
 
     if len(ievent.args):
-        ignore.add(ievent.args[0], ievent.nick)
+        ignores.add(ievent.args[0], ievent.nick)
+        bot.msg(choose_dest(ievent), '%s: cot' % ievent.nick)
+    return
+
+@expose("lartallow", 1)
+def lartllow(bot, ievent):
+    """lartallow <utente>"""
+
+    if len(ievent.args):
+        ignores.delete(ievent.args[0], ievent.nick)
         bot.msg(choose_dest(ievent), '%s: cot' % ievent.nick)
     return
 
