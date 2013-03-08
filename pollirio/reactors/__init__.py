@@ -13,7 +13,7 @@ def expose(text, args=None):
 
 def reactor_run(line, *args):
     for k in reactors.keys():
-        if re.findall(k, line):
+        if re.findall(k, line, re.IGNORECASE):
             return reactors.get(k)["func"](*args)
 
 from users import *
