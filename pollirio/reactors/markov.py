@@ -7,17 +7,17 @@ import random
 
 def create_chains(lines):
     markov_chain = {}
-    hasPrev = False
+    has_prev = False
     for line in lines:
-        for curword in line.split():
-            if curword != '':
-                curword = curword.lower()
-                if hasPrev == False:
-                    prevword = currWord
-                    hasPrev = True
+        for cur_word in line.split():
+            if cur_word != '':
+                cur_word = cur_word.lower()
+                if has_prev == False:
+                    prev_word = cur_word
+                    has_prev = True
                 else:
-                    markov_chain.setdefault(prevWord, []).append(currWord)
-                    prevWord = currWord
+                    markov_chain.setdefault(prev_word, []).append(cur_word)
+                    prev_word = cur_word
     return markov_chain
  
 def make_sentence(markov_chain, words=None):
