@@ -82,6 +82,7 @@ class MyBot(irc.IRCClient):
     # callback
     def privmsg(self, user, channel, msg):
         ievent = IrcEvent(user, channel, msg)
+        user = user.split('!', 1)[0]
 
         if msg[0] == '.':
             cmd = get_command(msg)
@@ -91,7 +92,6 @@ class MyBot(irc.IRCClient):
             else:
                 cmd = None
 
-        print ievent.user, channel, msg
         if user == "NickServ" or channel == "*":
 #            # TODO: check whether it really works this way
 #            if "unavailable" in msg:
