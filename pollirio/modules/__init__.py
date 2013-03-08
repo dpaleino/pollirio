@@ -37,5 +37,5 @@ def check_args(name, bot, ievent):
 
 from lart import *
 from polygen import *
-from bts import *
+#from bts import *
 from misc import *
