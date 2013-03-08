@@ -62,22 +62,29 @@ class MyBot(irc.IRCClient):
     # callback
     def connectionMade(self):
         irc.IRCClient.connectionMade(self)
-        self.logger = Logger(open(self.factory.logfile, "a"))
-        self.logger.log("[connected at %s]" %
+        self.loggers = {}
+        self.loggers['server'] = Logger(open('logs/server.log', 'a'))
+        self.loggers['server'].log("[connected at %s]" %
                         time.asctime(time.localtime(time.time())))
 
     # callback
     def connectionLost(self, reason):
         irc.IRCClient.connectionLost(self, reason)
-        self.logger.log("[disconnected at %s]" %
+        for l in self.loggers.values():
+            l.log("[disconnected at %s]" %
                         time.asctime(time.localtime(time.time())))
-        self.logger.close()
+            l.close()
 
     # callback
     def signedOn(self):
         self.msg('NickServ', 'identify %s %s' % (conf.nickname, conf.password))
         self.msg('NickServ', 'identify %s' % conf.password)
-        self.join(self.factory.channel)
+        for ch in self.factory.channels:
+            clean_name = ch[1:]
+            self.loggers[clean_name] = Logger(open('logs/%s.log' % clean_name, 'a'))
+            self.loggers[clean_name].log("[joined at %s]" %
+                                    time.asctime(time.localtime(time.time())))
+            self.join(ch)
 
     # callback
     def privmsg(self, user, channel, msg):
@@ -98,7 +105,8 @@ class MyBot(irc.IRCClient):
 #                self.msg('NickServ', 'release %s %s' % (conf.nickname, conf.password))
             return
 
-        self.logger.log("<%s> %s" % (user, msg))
+        if channel[1:] in self.loggers.keys():
+            self.loggers[channel[1:]].log("<%s> %s" % (user, msg))
 
         # execute the plugin if a command is passed
         if cmd and check_args(cmd, self, ievent):
@@ -111,29 +119,34 @@ class MyBot(irc.IRCClient):
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action."""
         user = user.split('!', 1)[0]
-        self.logger.log("* %s %s" % (user, msg))
+        if channel[1:] in self.loggers.keys():
+            self.loggers[channel[1:]].log("* %s %s" % (user, msg))
 
     # callback
     def irc_NICK(self, prefix, params):
         """Called when an IRC user changes their nickname."""
         old_nick = prefix.split('!')[0]
         new_nick = params[0]
-        self.logger.log("-!- %s is now known as %s" % (old_nick, new_nick))
+        if channel[1:] in self.loggers.keys():
+            self.loggers[channel[1:]].log("-!- %s is now known as %s" % (old_nick, new_nick))
 
     # callback
     def userJoined(self, user, channel):
         """Called when I see another user joining a channel."""
-        self.logger.log("-!- %s joined %s" % (user, channel))
+        if channel[1:] in self.loggers.keys():
+            self.loggers[channel[1:]].log("-!- %s joined %s" % (user, channel))
 
     # callback
     def userLeft(self, user, channel):
         """Called when I see another user leaving a channel."""
-        self.logger.log("-!- %s has left %s" % (user, channel))
+        if channel[1:] in self.loggers.keys():
+            self.loggers[channel[1:]].log("-!- %s has left %s" % (user, channel))
 
     # callback
     def userQuit(self, user, msg):
         """Called when I see another user disconnect from the network."""
-        self.logger.log("-!- %s has quit (%s)" % (user, msg))
+        if channel[1:] in self.loggers.keys():
+            self.loggers[channel[1:]].log("-!- %s has quit (%s)" % (user, msg))
 
     # callback
     def kickedFrom(self, channel, kicker, message):
@@ -143,15 +156,15 @@ class MyBot(irc.IRCClient):
     # callback
     def userKicked(self, kickee, channel, kicker, message):
         """Called when I observe someone else being kicked from a channel."""
-        self.logger.log("-!- %s has been kicked by %s (%s)" % (kickee, kicker, message))
+        if channel[1:] in self.loggers.keys():
+            self.loggers[channel[1:]].log("-!- %s has been kicked by %s (%s)" % (kickee, kicker, message))
 
 class MyBotFactory(protocol.ClientFactory):
     protocol = MyBot
 
-    def __init__(self, channel, nickname="pollirio"):
-        self.channel = channel
+    def __init__(self, channels, nickname="pollirio"):
+        self.channels = channels.split('\n')
         self.nickname = nickname
-        self.logfile = "%s.log" % self.channel[1:]
 
     def clientConnectionLost(self, connector, reason):
         print "Lost connection (%s), reconnecting." % (reason,)
@@ -163,7 +176,7 @@ class MyBotFactory(protocol.ClientFactory):
 def main():
     log.startLogging(sys.stdout)
 
-    reactor.connectTCP(conf.server_addr, conf.server_port, MyBotFactory(conf.channel, conf.nickname))
+    reactor.connectTCP(conf.server_addr, conf.server_port, MyBotFactory(conf.channels, conf.nickname))
     reactor.run()
 
 if __name__ == "__main__":

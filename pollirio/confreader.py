@@ -5,7 +5,7 @@ class ConfReader(object):
         defaults = {
             'nickname': 'pollirio',
             'password': '',
-            'channel': '#polloalforno',
+            'channels': '#polloalforno',
             'server_addr': 'calvino.freenode.net',
             'server_port': 6667,
         }
