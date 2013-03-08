@@ -104,7 +104,7 @@ class MyBot(irc.IRCClient):
             plugin_run(cmd, self, ievent)
 
         # run the reactors
-        reactor_run(msg, self.ievent)
+        reactor_run(msg, self, ievent)
 
     # callback
     def action(self, user, channel, msg):
