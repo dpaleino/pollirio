@@ -12,9 +12,10 @@ import time
 import re
 import sys
 
-from pollirio.modules.lart import *
 from pollirio.modules import plugin_run, check_args
-from pollirio import commands, get_command
+from pollirio.reactors import reactor_run
+from pollirio import commands, reactors
+from pollirio import get_command
 from pollirio import conf
 
 class Logger:
@@ -101,6 +102,9 @@ class MyBot(irc.IRCClient):
         # execute the plugin if a command is passed
         if cmd and check_args(cmd, self, ievent):
             plugin_run(cmd, self, ievent)
+
+        # run the reactors
+        reactor_run(msg)
 
     # callback
     def action(self, user, channel, msg):

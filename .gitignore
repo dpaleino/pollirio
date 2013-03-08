@@ -1,3 +1,7 @@
+pollirio.ini
+main.db
+*.log
+
 *.pyc
 *~
 .eric4project/

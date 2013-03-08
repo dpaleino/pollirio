@@ -4,6 +4,7 @@ from confreader import ConfReader
 
 conf = ConfReader('pollirio.ini')
 commands = {}
+reactors = {}
 
 def get_command(msg):
     # FIXME: allow a configurable control-character
