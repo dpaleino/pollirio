@@ -136,6 +136,11 @@ class MyBot(irc.IRCClient):
         self.logger.log("-!- %s has quit (%s)" % (user, msg))
 
     # callback
+    def kickedFrom(self, channel, kicker, message):
+        """ Called when I am kicked from a channel. """
+        self.join(channel)
+
+    # callback
     def userKicked(self, kickee, channel, kicker, message):
         """Called when I observe someone else being kicked from a channel."""
         self.logger.log("-!- %s has been kicked by %s (%s)" % (kickee, kicker, message))
