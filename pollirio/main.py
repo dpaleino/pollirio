@@ -52,12 +52,14 @@ class MyBot(irc.IRCClient):
         # FIXME: use the configurable nick
         irc.IRCClient.msg(self, channel, message)
         if message.find("ACTION") == -1:
-            self.loggers[channel[1:]].log("<%s> %s" % (conf.nickname, message))
+            if channel[1:] in self.loggers.keys():
+                self.loggers[channel[1:]].log("<%s> %s" % (conf.nickname, message))
 
     def describe(self, channel, message):
         # FIXME: use the configurable nick
         irc.IRCClient.describe(self, channel, message)
-        self.loggers[channel[1:]].log("* %s %s" % (conf.nickname, message))
+        if channel[1:] in self.loggers.keys():
+            self.loggers[channel[1:]].log("* %s %s" % (conf.nickname, message))
 
     # callback
     def connectionMade(self):
