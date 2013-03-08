@@ -37,6 +37,6 @@ def make_sentence(markov_chain, words=None):
 
 @expose('^%s' % conf.nickname)
 def talk(bot, ievent):
-    source = 'pg28867.txt'
+    source = 'data/pg28867.txt'
     mc = create_chains(open(source))
     bot.msg(choose_dest(ievent), '%s: %s' % (ievent.nick, make_sentence(mc)))
