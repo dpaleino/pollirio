@@ -16,5 +16,6 @@ def reactor_run(line, *args):
         if re.findall(k, line, re.IGNORECASE):
             return reactors.get(k)["func"](*args)
 
+from markov import *
 from users import *
 from misc import *
