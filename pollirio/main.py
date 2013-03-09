@@ -129,8 +129,7 @@ class MyBot(irc.IRCClient):
         """Called when an IRC user changes their nickname."""
         old_nick = prefix.split('!')[0]
         new_nick = params[0]
-        if channel[1:] in self.loggers.keys():
-            self.loggers[channel[1:]].log("-!- %s is now known as %s" % (old_nick, new_nick))
+        self.loggers['server'].log("-!- %s is now known as %s" % (old_nick, new_nick))
 
     # callback
     def userJoined(self, user, channel):
@@ -147,8 +146,7 @@ class MyBot(irc.IRCClient):
     # callback
     def userQuit(self, user, msg):
         """Called when I see another user disconnect from the network."""
-        if channel[1:] in self.loggers.keys():
-            self.loggers[channel[1:]].log("-!- %s has quit (%s)" % (user, msg))
+        self.loggers['server'].log("-!- %s has quit (%s)" % (user, msg))
 
     # callback
     def kickedFrom(self, channel, kicker, message):
