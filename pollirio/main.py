@@ -91,7 +91,6 @@ class MyBot(irc.IRCClient):
     # callback
     def privmsg(self, user, channel, msg):
         ievent = IrcEvent(user, channel, msg)
-        user = user.split('!', 1)[0]
 
         if msg[0] == '.':
             cmd = get_command(msg)
@@ -101,14 +100,14 @@ class MyBot(irc.IRCClient):
             else:
                 cmd = None
 
-        if user == "NickServ" or channel == "*":
+        if ievent.nick == "NickServ" or channel == "*":
 #            # TODO: check whether it really works this way
 #            if "unavailable" in msg:
 #                self.msg('NickServ', 'release %s %s' % (conf.nickname, conf.password))
             return
 
         if channel[1:] in self.loggers.keys():
-            self.loggers[channel[1:]].log("<%s> %s" % (user, msg))
+            self.loggers[channel[1:]].log("<%s> %s" % (ievent.nick, msg))
 
         # execute the plugin if a command is passed
         if cmd and check_args(cmd, self, ievent):
