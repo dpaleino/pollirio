@@ -25,7 +25,7 @@ def check_args(name, bot, ievent):
     if name in commands:
         if commands.get(name)["args"]:
             # TODO: check if we have all the arguments
-            print len(ievent.args), commands.get(name)["args"]
+            #print len(ievent.args), commands.get(name)["args"]
             if len(ievent.args) < commands.get(name)["args"]:
                 bot.msg(ievent.channel, "%s: %s" % (ievent.nick, commands.get(name)["func"].__doc__))
                 return False
