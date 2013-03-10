@@ -40,3 +40,4 @@ from polygen import *
 #from bts import *
 from misc import *
 from channel import *
+from quotes import *
