@@ -11,6 +11,7 @@ import random
 import time
 import re
 import sys
+from collections import defaultdict
 
 from pollirio.modules import plugin_run, check_args
 from pollirio.reactors import reactor_run
@@ -47,6 +48,8 @@ class MyBot(irc.IRCClient):
         return self.factory.nickname
     nickname = property(_get_nickname)
 
+    userlist = {}
+
     # override IRCClient's methods, just to get them logged
     def msg(self, channel, message):
         # FIXME: use the configurable nick
@@ -81,12 +84,36 @@ class MyBot(irc.IRCClient):
     def signedOn(self):
         self.msg('NickServ', 'identify %s %s' % (conf.nickname, conf.password))
         self.msg('NickServ', 'identify %s' % conf.password)
+        self.join_channels()
+
+    def join_channels(self):
         for ch in self.factory.channels:
             clean_name = ch[1:]
             self.loggers[clean_name] = Logger(open('logs/%s.log' % clean_name, 'a'))
             self.loggers[clean_name].log("[joined at %s]" %
                                     time.asctime(time.localtime(time.time())))
             self.join(ch)
+            self.userlist[ch] = defaultdict(str)
+            self.sendLine('WHO %s' % ch)
+
+    # callback
+    def irc_RPL_WHOREPLY(self, *nargs):
+        server, values = nargs
+        channel = values[1]
+        nickname = values[5]
+        mode = values[6]
+
+        self.userlist[channel][nickname] = mode
+
+    # callback
+    def irc_RPL_ENDOFWHO(self, *nargs):
+        #~ print self.userlist
+        pass
+        # ~ = proprietario
+        # & = amministratore
+        # @ = op
+        # % = hop
+        # + = voice
 
     # callback
     def privmsg(self, user, channel, msg):
@@ -128,6 +155,10 @@ class MyBot(irc.IRCClient):
         """Called when an IRC user changes their nickname."""
         old_nick = prefix.split('!')[0]
         new_nick = params[0]
+        for channel in self.userlist:
+            if self.userlist[channel].has_key(old_nick):
+                self.userlist[channel][new_nick] = self.userlist[channel][old_nick]
+                del self.userlist[channel][old_nick]
         self.loggers['server'].log("-!- %s is now known as %s" % (old_nick, new_nick))
 
     # callback
@@ -141,6 +172,12 @@ class MyBot(irc.IRCClient):
         """Called when I see another user leaving a channel."""
         if channel[1:] in self.loggers.keys():
             self.loggers[channel[1:]].log("-!- %s has left %s" % (user, channel))
+        # cleanup userlist
+        if self.userlist.has_key(channel):
+            try:
+                del self.userlist[channel][user]
+            except KeyError:
+                pass
 
     # callback
     def userQuit(self, user, msg):
@@ -157,6 +194,37 @@ class MyBot(irc.IRCClient):
         """Called when I observe someone else being kicked from a channel."""
         if channel[1:] in self.loggers.keys():
             self.loggers[channel[1:]].log("-!- %s has been kicked by %s (%s)" % (kickee, kicker, message))
+        # cleanup userlist
+        if self.userlist.has_key(channel):
+            try:
+                del self.userlist[channel][kickee]
+            except KeyError:
+                pass
+
+    # callback
+    def modeChanged(self, user, channel, set, modes, args):
+        changer = user.split('!', 1)[0]
+        if channel and args:
+            subject = args[0]
+            if not subject:
+                return
+
+            # TODO: owner e admin sono settabili/revocabili? IMHO no.
+            umodes = []
+            if 'o' in modes:
+                umodes.append('@')
+            if 'h' in modes:
+                umodes.append('%')
+            if 'v' in modes:
+                umodes.append('+')
+
+            if set:
+                # modes being added
+                self.userlist[channel][subject] += ''.join(umodes)
+            else:
+                # modes being removed
+                for m in umodes:
+                    self.userlist[channel][subject] = self.userlist[channel][subject].replace(m, '')
 
 class MyBotFactory(protocol.ClientFactory):
     protocol = MyBot
