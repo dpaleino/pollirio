@@ -23,7 +23,6 @@ def linxys(bot, ievent):
 		'Linxys :***',
 		'Linxys ti difendo io!',
 		'hey, Linxys! Non tradirmi! :(',
-		'come recluta Linxys...',
 	]
 	msg = randomize_msg(sentences)
 	if msg:
