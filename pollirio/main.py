@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# © 2010, David Paleino <dapal@debian.org>
+# © 2010-2013, David Paleino <d.paleino@gmail.com>
 
 from twisted.words.protocols import irc
 from twisted.internet import protocol, reactor
