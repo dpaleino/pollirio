@@ -39,3 +39,4 @@ from lart import *
 from polygen import *
 #from bts import *
 from misc import *
+from channel import *
