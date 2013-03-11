@@ -41,3 +41,4 @@ from polygen import *
 from misc import *
 from channel import *
 from quotes import *
+from erepublik import *
