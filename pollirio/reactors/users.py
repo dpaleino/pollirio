@@ -6,7 +6,7 @@ from pollirio import choose_dest
 import random
 
 def randomize_msg(sentences):
-	times = random.randint(0, len(sentences) / 3)
+	times = len(sentences) * 4
 	while times > 0:
 		index = random.randint(0, len(sentences) - 1)
 		sentences.insert(index, None)
