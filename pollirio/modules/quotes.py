@@ -47,7 +47,7 @@ quotes = QuotesDb()
 
 @expose('quote-size')
 def quotesize(bot, ievent):
-    bot.msg(choose_dest(ievent), '%s: al momento conosco %s quotes.' % (ievent.nick, quotes.size()))
+    bot.msg(choose_dest(ievent), '%s: al momento conosco \x02%s\x0F quotes.' % (ievent.nick, quotes.size()))
 
 @expose('quote')
 def quote(bot, ievent):
@@ -76,7 +76,7 @@ def quoteadd(bot, ievent):
       ievent.nick == 'dapal':
         args = ievent.msg.split(' ', 1)
         id = quotes.add(args[1])
-        bot.msg(choose_dest(ievent), '%s: quote %s aggiunto.' % (ievent.nick, id))
+        bot.msg(choose_dest(ievent), '%s: quote \x02%s\x0F aggiunto.' % (ievent.nick, id))
 
 @expose('quote-del', 1)
 def quotedel(bot, ievent):
@@ -89,7 +89,7 @@ def quotedel(bot, ievent):
       ievent.nick == 'dapal':
         id = int(ievent.args[0])
         if quotes.delete(id):
-            bot.msg(choose_dest(ievent), '%s: quote %s cancellato.' % (ievent.nick, id))
+            bot.msg(choose_dest(ievent), '%s: quote \x02%s\x0F cancellato.' % (ievent.nick, id))
         else:
             bot.msg(choose_dest(ievent), '%s: impossibile cancellare il quote %s.' % (ievent.nick, id))
 
@@ -100,5 +100,5 @@ def quotesearch(bot, ievent):
     args = ievent.msg.split(' ', 1)
     query = args[1]
     for id, quote, createtime, user in quotes.search(query):
-        bot.msg(choose_dest(ievent), '#%s: %s' % (id, quote.encode('utf-8')))
+        bot.msg(choose_dest(ievent), '\x02#%s\x0F: %s' % (id, quote.encode('utf-8')))
         time.sleep(0.75)
