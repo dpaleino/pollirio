@@ -57,7 +57,7 @@ def request(resource, **args):
 def get_uid(bot, ievent, user):
 	ret = users.search(user)
 	if ret:
-		return ret[2]
+		return int(ret[0][2])
 	data = request('citizen.search', query=user.replace(' ', '_'), page=1)
 	if data:
 		uid = data[0]['id']
