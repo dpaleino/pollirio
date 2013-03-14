@@ -60,7 +60,7 @@ def quote(bot, ievent):
         except exceptions.ValueError:
             quote = quotes.random()
 
-    bot.msg(choose_dest(ievent), quote)
+    bot.msg(choose_dest(ievent), quote.encode('utf-8'))
 
 @expose('quote-add', 1)
 def quoteadd(bot, ievent):
@@ -96,6 +96,6 @@ def quotesearch(bot, ievent):
     '''quote-search <query>'''
     args = ievent.msg.split(' ', 1)
     query = args[1]
-    for id, quote in quotes.search(query):
+    for id, quote, createtime, user in quotes.search(query):
         bot.msg(choose_dest(ievent), '#%s: %s' % (id, quote.encode('utf-8')))
         time.sleep(0.75)
