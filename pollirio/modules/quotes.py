@@ -60,7 +60,10 @@ def quote(bot, ievent):
         except exceptions.ValueError:
             quote = quotes.random()
 
-    bot.msg(choose_dest(ievent), quote.encode('utf-8'))
+    if quote:
+        bot.msg(choose_dest(ievent), quote.encode('utf-8'))
+    else:
+        bot.msg(choose_dest(ievent), '%s: non ho un quote \x02%d\x0F.' % (ievent.nick, int(ievent.args[0])))
 
 @expose('quote-add', 1)
 def quoteadd(bot, ievent):
