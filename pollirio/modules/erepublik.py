@@ -1,12 +1,30 @@
 # -*- coding: utf-8 -*-
 
 from pollirio.modules import expose
+from pollirio.dbutils import *
 from pollirio import choose_dest
 from pollirio import conf
 
 import cjson as json
 from urllib2 import urlopen
 from datetime import datetime
+
+class UsersDb:
+	def __init__(self):
+		self.db = db_init('erep_users')
+
+	def search(self, what):
+		rs = run(self.db.select(self.db.c.username.like('%s' % what))).fetchall()
+		return rs
+
+	def add(self, username, user_id):
+		rs = run(self.db.insert({
+			'username': unicode(username, 'utf-8'),
+			'user_id': str(int(user_id))
+		}))
+		return rs.last_inserted_ids()[0]
+
+users = UsersDb()
 
 api_key = conf.config.get('erepublik', 'api_key')
 api_url = conf.config.get('erepublik', 'api_url')
@@ -37,10 +55,15 @@ def request(resource, **args):
 	return json.decode(''.join(ret.readlines()))
 
 def get_uid(bot, ievent, user):
+	ret = users.search(user)
+	if ret:
+		return ret[3]
 	data = request('citizen.search', query=user.replace(' ', '_'), page=1)
-	try:
-		return data[0]['id']
-	except IndexError:
+	if data:
+		uid = data[0]['id']
+		users.add(user, uid)
+		return uid
+	else:
 		bot.msg(choose_dest(ievent), '%s: utente «%s» non trovato.' % (ievent.nick, user))
 		return None
 	
