@@ -4,9 +4,15 @@ from pollirio.reactors import expose
 from pollirio import conf, choose_dest
 
 import random
+import cPickle
 
-def create_chains(lines):
-    markov_chain = {}
+markov_data = 'data/markov.pkl'
+try:
+    markov_chains = cPickle.load(open(markov_data))
+except IOError:
+    markov_chains = {}
+
+def update_chains(lines):
     has_prev = False
     for line in lines:
         for cur_word in line.split():
@@ -16,27 +22,41 @@ def create_chains(lines):
                     prev_word = cur_word
                     has_prev = True
                 else:
-                    markov_chain.setdefault(prev_word, []).append(cur_word)
+                    markov_chains.setdefault(prev_word, []).append(cur_word)
                     prev_word = cur_word
-    return markov_chain
  
-def make_sentence(markov_chain, words=None):
+def make_sentence(words=None):
     while True:
         if not words:
-            word = random.choice(markov_chain.keys())
+            word = random.choice(markov_chains.keys())
         else:
             word = random.choice(words)
         if word[-1] not in ('.','?'):
             break
     generated_sentence = word.capitalize()
     while word[-1] not in ('.','?'):
-        newword = random.choice(markov_chain[word])
-        generated_sentence += ' '+newword
-        word = newword #TODO fix possible crash if this is not a key (last word parsed)
+        try:
+            newword = random.choice(markov_chains[word])
+            generated_sentence += ' '+newword
+            word = newword #TODO fix possible crash if this is not a key (last word parsed)
+        except KeyError:
+            generated_sentence += '.'
+            word = '.'
     return generated_sentence
+
+@expose('.*')
+def learn(bot, ievent):
+    if ievent.msg.startswith(conf.nickname):
+        # pass control to talk()
+        talk(bot, ievent)
+        return
+    if ievent.channel.startswith('#'):
+        update_chains([ievent.msg])
+        print markov_chains
+        cPickle.dump(markov_chains, open(markov_data, 'w'))
 
 @expose('^%s' % conf.nickname)
 def talk(bot, ievent):
-    source = 'data/pg28867.txt'
-    mc = create_chains(open(source))
-    bot.msg(choose_dest(ievent), '%s: %s' % (ievent.nick, make_sentence(mc)))
+    #source = 'data/pg28867.txt'
+    #mc = create_chains(open(source))
+    bot.msg(choose_dest(ievent), '%s: %s' % (ievent.nick, make_sentence()))
