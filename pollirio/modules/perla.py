@@ -56,7 +56,7 @@ def perla(bot, ievent):
         perla = perle.random()
     else:
         try:
-            perla = perle.idperla(int(ievent.args[1]))
+            perla = perle.idperla(int(ievent.args[0]))
         except exceptions.ValueError:
             perla = perle.random()
 
