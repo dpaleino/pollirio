@@ -147,3 +147,14 @@ def link_profile(bot, ievent):
 	if not user_id:
 		return
 	bot.msg(choose_dest(ievent), '%s: http://www.erepublik.com/en/economy/donate-items/%s' % (ievent.nick, user_id))
+
+@expose('egov')
+def egov_profile(bot, ievent):
+	if len(ievent.args) == 0:
+		user = ievent.nick
+	else:
+		user = ' '.join(ievent.args)
+	user_id = get_uid(bot, ievent, user)
+	if not user_id:
+		return
+	bot.msg(choose_dest(ievent), '%s: http://egov4you.info/citizen/overview/%s' % (ievent.nick, user_id))
