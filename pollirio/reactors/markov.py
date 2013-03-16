@@ -52,7 +52,7 @@ def learn(bot, ievent):
         return
     if ievent.channel.startswith('#'):
         update_chains([ievent.msg])
-        print markov_chains
+        #print markov_chains
         cPickle.dump(markov_chains, open(markov_data, 'w'))
 
 @expose('^%s' % conf.nickname)
