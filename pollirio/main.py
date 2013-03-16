@@ -137,9 +137,9 @@ class MyBot(irc.IRCClient):
         # execute the plugin if a command is passed
         if cmd and check_args(cmd, self, ievent):
             plugin_run(cmd, self, ievent)
-
-        # run the reactors
-        reactor_run(msg, self, ievent)
+        else:
+            # run the reactors
+            reactor_run(msg, self, ievent)
 
     # callback
     def action(self, user, channel, msg):
