@@ -36,6 +36,7 @@ def check_args(name, bot, ievent):
     return False
 
 from lart import *
+from perla import *
 from polygen import *
 #from bts import *
 from misc import *
