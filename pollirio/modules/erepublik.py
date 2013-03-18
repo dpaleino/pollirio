@@ -78,6 +78,12 @@ def list_profile(bot, ievent):
 		return
 	profile = request('citizen.profile', id=user_id)
 	age = datetime.now() - datetime.strptime(profile['birth'], '%Y-%m-%d')
+
+	if not profile.has_key('party'):
+		profile['party']= {'name': 'Nessun partito'}
+	if not profile.has_key('army'):
+		profile['army'] = {'name': 'Nessuna MU'}
+
 	bot.msg(
 		choose_dest(ievent),
 		'\x02ID:\x0F %s ' \
