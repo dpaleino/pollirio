@@ -55,7 +55,8 @@ def learn(bot, ievent):
         #print markov_chains
         cPickle.dump(markov_chains, open(markov_data, 'w'))
 
-@expose('^%s' % conf.nickname)
+# commented because triggered from learn()
+#@expose('^%s' % conf.nickname)
 def talk(bot, ievent):
     #source = 'data/pg28867.txt'
     #mc = create_chains(open(source))
