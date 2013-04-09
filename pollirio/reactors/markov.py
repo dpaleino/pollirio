@@ -48,7 +48,10 @@ def make_sentence(words=None, alternative=False):
         try:
             subchain = markov_chains['all'][word]
             if alternative:
-                additional_subchain = [x for x in markov_chains['fanculo'][word] if x not in subchain]
+                try:
+                    additional_subchain = [x for x in markov_chains['fanculo'][word] if x not in subchain]
+                except KeyError:
+                    additional_subchain = []
                 newword = random.choice(subchain + additional_subchain)
             else:
                 newword = random.choice(subchain)
@@ -63,9 +66,10 @@ def make_sentence(words=None, alternative=False):
 def learn(bot, ievent):
     if ievent.msg.startswith(conf.nickname) or (ievent.channel == '#fanculo' and conf.nickname in ievent.msg):
         if ievent.channel == '#fanculo':
-            # learn from here too.
-            update_chains([ievent.msg.replace(conf.nickname, '')], True)
-            words = ievent.msg.replace(conf.nickname, '').split()
+            # learn from here too, unless a bot is speaking
+            if ievent.nick not in ['godzilla', 'parrot']:
+                update_chains([ievent.msg.replace(conf.nickname, '')], True)
+                words = ievent.msg.replace(conf.nickname, '').split()
             talk(bot, ievent, words, True)
         else:
             talk(bot, ievent)
