@@ -6,8 +6,9 @@ from pollirio import choose_dest
 from pollirio import conf
 
 import cjson as json
-from urllib2 import urlopen
+from urllib2 import urlopen, HTTPError
 from datetime import datetime
+from time import sleep
 
 class UsersDb:
     def __init__(self):
@@ -51,7 +52,13 @@ def request(resource, **args):
     }
     if resource not in patterns:
         return None
-    ret = urlopen(api_url + patterns[resource] % args + '.json?key=%s' % api_key)
+    while True:
+        try:
+            ret = urlopen(api_url + patterns[resource] % args + '.json?key=%s' % api_key)
+        except HTTPError:
+            sleep(1)
+            continue
+        break
     return json.decode(''.join(ret.readlines()))
 
 def get_uid(bot, ievent, user):
