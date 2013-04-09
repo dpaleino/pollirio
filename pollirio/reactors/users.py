@@ -53,3 +53,7 @@ def erre(bot, ievent):
     msg = randomize_msg(sentences)
     if msg:
         bot.msg(choose_dest(ievent), msg)
+
+@expose('favola fox')
+def favola_fox(bot, ievent):
+    bot.msg(choose_dest(ievent), '%s: favola fox troia' % ievent.nick)
