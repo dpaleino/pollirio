@@ -24,7 +24,7 @@ def update_chains(lines):
                 else:
                     markov_chains.setdefault(prev_word, []).append(cur_word)
                     prev_word = cur_word
- 
+
 def make_sentence(words=None):
     while True:
         if not words:
@@ -46,11 +46,11 @@ def make_sentence(words=None):
 
 @expose('.*')
 def learn(bot, ievent):
-    if ievent.msg.startswith(conf.nickname):
+    if ievent.msg.startswith(conf.nickname) or ievent.channel == '#fanculo':
         # pass control to talk()
         talk(bot, ievent)
         return
-    if ievent.channel.startswith('#'):
+    if ievent.channel.startswith('#') and ievent.channel != '#fanculo':
         update_chains([ievent.msg])
         #print markov_chains
         cPickle.dump(markov_chains, open(markov_data, 'w'))
