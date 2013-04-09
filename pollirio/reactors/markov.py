@@ -69,7 +69,7 @@ def learn(bot, ievent):
             # learn from here too, unless a bot is speaking
             if ievent.nick not in ['godzilla', 'parrot']:
                 update_chains([ievent.msg.replace(conf.nickname, '')], True)
-                words = ievent.msg.replace(conf.nickname, '').split()
+            words = ievent.msg.replace(conf.nickname, '').split()
             talk(bot, ievent, words, True)
         else:
             talk(bot, ievent)
