@@ -46,7 +46,7 @@ def make_sentence(words=None):
 
 @expose('.*')
 def learn(bot, ievent):
-    if ievent.msg.startswith(conf.nickname) or ievent.channel == '#fanculo':
+    if ievent.msg.startswith(conf.nickname) or (ievent.channel == '#fanculo' and conf.nickname in ievent.msg):
         # pass control to talk()
         talk(bot, ievent)
         return
