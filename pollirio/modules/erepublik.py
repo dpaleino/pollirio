@@ -165,3 +165,101 @@ def egov_profile(bot, ievent):
         return
     bot.msg(choose_dest(ievent), '%s: http://egov4you.info/citizen/overview/%s' % (ievent.nick, user_id))
 
+@expose('rankup')
+def rankup(bot, ievent):
+    rankings = {
+        0: 'Recruit',
+        15: 'Private',
+        45: 'Private*',
+        80: 'Private**',
+        120: 'Private***',
+        170: 'Corporal',
+        250: 'Corporal*',
+        350: 'Corporal**',
+        450: 'Corporal***',
+        600: 'Sergeant',
+        800: 'Sergeant*',
+        1000: 'Sergeant**',
+        1400: 'Sergeant***',
+        1850: 'Lieutenant',
+        2350: 'Lieutenant*',
+        3000: 'Lieutenant**',
+        3750: 'Lieutenant***',
+        5000: 'Captain',
+        6500: 'Captain*',
+        9000: 'Captain**',
+        12000: 'Captain***',
+        15500: 'Major',
+        20000: 'Major*',
+        25000: 'Major**',
+        31000: 'Major***',
+        40000: 'Commander',
+        52000: 'Commander*',
+        67000: 'Commander**',
+        85000: 'Commander***',
+        110000: 'Lt Colonel',
+        140000: 'Lt Colonel*',
+        180000: 'Lt Colonel**',
+        225000: 'Lt Colonel***',
+        285000: 'Colonel',
+        355000: 'Colonel*',
+        435000: 'Colonel**',
+        540000: 'Colonel***',
+        660000: 'General',
+        800000: 'General*',
+        950000: 'General**',
+        1140000: 'General***',
+        1350000: 'Field Marshal',
+        1600000: 'Field Marshal*',
+        1875000: 'Field Marshal**',
+        2185000: 'Field Marshal***',
+        2550000: 'Supreme Marshal',
+        3000000: 'Supreme Marshal*',
+        3500000: 'Supreme Marshal**',
+        4150000: 'Supreme Marshal***',
+        4900000: 'National Force',
+        5800000: 'National Force*',
+        7000000: 'National Force**',
+        9000000: 'National Force***',
+        11500000: 'World Class Force',
+        14500000: 'World Class Force*',
+        18000000: 'World Class Force**',
+        22000000: 'World Class Force***',
+        26500000: 'Legendary Force',
+        31500000: 'Legendary Force*',
+        37000000: 'Legendary Force**',
+        43000000: 'Legendary Force***',
+        50000000: 'God of War',
+        100000000: 'God of War*',
+        200000000: 'God of War**',
+        500000000: 'God of War***',
+    }
+
+    if len(ievent.args) == 0:
+        user = ievent.nick
+    else:
+        user = ' '.join(ievent.args)
+    user_id = get_uid(bot, ievent, user)
+    if not user_id:
+        return
+    profile = request('citizen.profile', id=user_id)
+
+    next_rank_inf = 0
+    for inf in sorted(rankings.keys()):
+        if inf >= profile['rank']['points']:
+            next_rank_inf = inf
+            break
+    next_rank = rankings[next_rank_inf]
+    req_inf = (next_rank_inf - profile['rank']['points']) * 10
+
+    hit = int(profile['hit']) * 1.0
+    hit_q0 = int(req_inf / hit)
+
+    msg = 'Prossimo rank per %s: \x02%s\x0F :: Inf richiesta: %d :: Q0: \x02%s\x0F :: Q1: \x02%s\x0F :: Q2: \x02%s\x0F :: Q3: \x02%s\x0F :: Q4: \x02%s\x0F :: Q5: \x02%s\x0F :: Q6: \x02%s\x0F :: Q7: \x02%s\x0F' % \
+        (profile['name'], next_rank, req_inf, hit_q0, int(hit_q0 / 1.2),
+         int(hit_q0 / 1.4), int(hit_q0 / 1.6), int(hit_q0 / 1.8),
+         int(hit_q0 / 2), int(hit_q0 / 2.2), int(hit_q0 / 3))
+
+    bot.msg(choose_dest(ievent), msg)
+
+## https://docs.google.com/document/pub?id=1WYgNCGj-TO0e0PJU4j_Pl9gjbgs70O5Glt3x-7XMg3A
