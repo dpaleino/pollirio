@@ -72,11 +72,12 @@ class MyBot(irc.IRCClient):
 
     # callback
     def connectionLost(self, reason):
-        irc.IRCClient.connectionLost(self, reason)
         for l in self.loggers.values():
-            l.log("[disconnected at %s]" %
-                        time.asctime(time.localtime(time.time())))
+            l.log("[disconnected at %s -- %s]" %
+                (time.asctime(time.localtime(time.time())), reason)
+            )
             l.close()
+        irc.IRCClient.connectionLost(self, reason)
 
     # callback
     def signedOn(self):
