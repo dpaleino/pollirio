@@ -69,7 +69,7 @@ def perla(bot, ievent):
 def perlaadd(bot, ievent):
     '''perla-add <testo>'''
     bot.sendLine('WHO %s' % ievent.channel)
-    modes = bot.userlist[ievent.channel][ievent.nick]
+    modes = bot.userlist[ievent.channel.lower()][ievent.nick]
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \
@@ -82,7 +82,7 @@ def perlaadd(bot, ievent):
 def perladel(bot, ievent):
     '''perla-del <id>'''
     bot.sendLine('WHO %s' % ievent.channel)
-    modes = bot.userlist[ievent.channel][ievent.nick]
+    modes = bot.userlist[ievent.channel.lower()][ievent.nick]
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \

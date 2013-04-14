@@ -54,13 +54,15 @@ class MyBot(irc.IRCClient):
     def msg(self, channel, message):
         irc.IRCClient.msg(self, channel, message)
         if message.find("ACTION") == -1:
-            if channel[1:] in self.loggers.keys():
-                self.loggers[channel[1:]].log("<%s> %s" % (conf.nickname, message))
+            ch = channel[1:].lower()
+            if ch in self.loggers.keys():
+                self.loggers[ch].log("<%s> %s" % (conf.nickname, message))
 
     def describe(self, channel, message):
         irc.IRCClient.describe(self, channel, message)
-        if channel[1:] in self.loggers.keys():
-            self.loggers[channel[1:]].log("* %s %s" % (conf.nickname, message))
+        ch = channel[1:].lower()
+        if ch in self.loggers.keys():
+            self.loggers[ch].log("* %s %s" % (conf.nickname, message))
 
     # callback
     def connectionMade(self):
@@ -87,12 +89,12 @@ class MyBot(irc.IRCClient):
 
     def join_channels(self):
         for ch in self.factory.channels:
-            clean_name = ch[1:]
+            clean_name = ch[1:].lower()
             self.loggers[clean_name] = Logger(open('logs/%s.log' % clean_name, 'a'))
             self.loggers[clean_name].log("[joined at %s]" %
                                     time.asctime(time.localtime(time.time())))
             self.join(ch)
-            self.userlist[ch] = defaultdict(str)
+            self.userlist[ch.lower()] = defaultdict(str)
             self.sendLine('WHO %s' % ch)
 
     # callback
@@ -102,7 +104,7 @@ class MyBot(irc.IRCClient):
         nickname = values[5]
         mode = values[6]
 
-        self.userlist[channel][nickname] = mode
+        self.userlist[channel.lower()][nickname] = mode
 
     # callback
     def irc_RPL_ENDOFWHO(self, *nargs):
@@ -132,8 +134,9 @@ class MyBot(irc.IRCClient):
 #                self.msg('NickServ', 'release %s %s' % (conf.nickname, conf.password))
             return
 
-        if channel[1:] in self.loggers.keys():
-            self.loggers[channel[1:]].log("<%s> %s" % (ievent.nick, msg))
+        ch = channel[1:].lower()
+        if ch in self.loggers.keys():
+            self.loggers[ch].log("<%s> %s" % (ievent.nick, msg))
 
         # execute the plugin if a command is passed
         if cmd and check_args(cmd, self, ievent):
@@ -146,8 +149,9 @@ class MyBot(irc.IRCClient):
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action."""
         user = user.split('!', 1)[0]
-        if channel[1:] in self.loggers.keys():
-            self.loggers[channel[1:]].log("* %s %s" % (user, msg))
+        ch = channel[1:].lower()
+        if ch in self.loggers.keys():
+            self.loggers[ch].log("* %s %s" % (user, msg))
 
     # callback
     def irc_NICK(self, prefix, params):
@@ -163,18 +167,20 @@ class MyBot(irc.IRCClient):
     # callback
     def userJoined(self, user, channel):
         """Called when I see another user joining a channel."""
-        if channel[1:] in self.loggers.keys():
-            self.loggers[channel[1:]].log("-!- %s joined %s" % (user, channel))
+        ch = channel[1:].lower()
+        if ch in self.loggers.keys():
+            self.loggers[ch].log("-!- %s joined %s" % (user, channel))
 
     # callback
     def userLeft(self, user, channel):
         """Called when I see another user leaving a channel."""
-        if channel[1:] in self.loggers.keys():
-            self.loggers[channel[1:]].log("-!- %s has left %s" % (user, channel))
+        ch = channel[1:].lower()
+        if ch in self.loggers.keys():
+            self.loggers[ch].log("-!- %s has left %s" % (user, channel))
         # cleanup userlist
-        if self.userlist.has_key(channel):
+        if self.userlist.has_key(channel.lower()):
             try:
-                del self.userlist[channel][user]
+                del self.userlist[channel.lower()][user]
             except KeyError:
                 pass
 
@@ -191,12 +197,13 @@ class MyBot(irc.IRCClient):
     # callback
     def userKicked(self, kickee, channel, kicker, message):
         """Called when I observe someone else being kicked from a channel."""
-        if channel[1:] in self.loggers.keys():
-            self.loggers[channel[1:]].log("-!- %s has been kicked by %s (%s)" % (kickee, kicker, message))
+        ch = channel[1:].lower()
+        if ch in self.loggers.keys():
+            self.loggers[ch].log("-!- %s has been kicked by %s (%s)" % (kickee, kicker, message))
         # cleanup userlist
-        if self.userlist.has_key(channel):
+        if self.userlist.has_key(channel.lower()):
             try:
-                del self.userlist[channel][kickee]
+                del self.userlist[channel.lower()][kickee]
             except KeyError:
                 pass
 
@@ -219,11 +226,11 @@ class MyBot(irc.IRCClient):
 
             if set:
                 # modes being added
-                self.userlist[channel][subject] += ''.join(umodes)
+                self.userlist[channel.lower()][subject] += ''.join(umodes)
             else:
                 # modes being removed
                 for m in umodes:
-                    self.userlist[channel][subject] = self.userlist[channel][subject].replace(m, '')
+                    self.userlist[channel.lower()][subject] = self.userlist[channel.lower()][subject].replace(m, '')
 
 class MyBotFactory(protocol.ClientFactory):
     protocol = MyBot

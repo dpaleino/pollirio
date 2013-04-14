@@ -105,7 +105,7 @@ def lart(bot, ievent):
 def lartignore(bot, ievent):
     """lartignore <utente>"""
     bot.sendLine('WHO %s' % ievent.channel)
-    modes = bot.userlist[ievent.channel][ievent.nick]
+    modes = bot.userlist[ievent.channel.lower()][ievent.nick]
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \
@@ -119,7 +119,7 @@ def lartignore(bot, ievent):
 def lartllow(bot, ievent):
     """lartallow <utente>"""
     bot.sendLine('WHO %s' % ievent.channel)
-    modes = bot.userlist[ievent.channel][ievent.nick]
+    modes = bot.userlist[ievent.channel.lower()][ievent.nick]
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \
@@ -140,7 +140,7 @@ def lartadd(bot, ievent):
     """lart-add <testo contenente $who>"""
     args = ievent.msg.split(" ", 1)
     bot.sendLine('WHO %s' % ievent.channel)
-    modes = bot.userlist[ievent.channel][ievent.nick]
+    modes = bot.userlist[ievent.channel.lower()][ievent.nick]
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \
@@ -153,7 +153,7 @@ def lartadd(bot, ievent):
 def lartdel(bot, ievent):
     """lart-del <id del lart>"""
     bot.sendLine('WHO %s' % ievent.channel)
-    modes = bot.userlist[ievent.channel][ievent.nick]
+    modes = bot.userlist[ievent.channel.lower()][ievent.nick]
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \

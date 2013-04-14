@@ -9,12 +9,12 @@ def mass(bot, ievent, msg=None):
     if ievent.channel == conf.nickname:
         return
     bot.sendLine('WHO %s' % ievent.channel)
-    modes = bot.userlist[ievent.channel][ievent.nick]
+    modes = bot.userlist[ievent.channel.lower()][ievent.nick]
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \
       ievent.nick == 'dapal':
-        users = bot.userlist[ievent.channel].keys()
+        users = bot.userlist[ievent.channel.lower()].keys()
         bot.msg(ievent.channel, ' '.join(users))
         if msg:
             bot.msg(ievent.channel, '\x02%s\x0F' % msg)

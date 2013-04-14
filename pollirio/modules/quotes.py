@@ -69,7 +69,7 @@ def quote(bot, ievent):
 def quoteadd(bot, ievent):
     '''quote-add <testo>'''
     bot.sendLine('WHO %s' % ievent.channel)
-    modes = bot.userlist[ievent.channel][ievent.nick]
+    modes = bot.userlist[ievent.channel.lower()][ievent.nick]
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \
@@ -82,7 +82,7 @@ def quoteadd(bot, ievent):
 def quotedel(bot, ievent):
     '''quote-del <id>'''
     bot.sendLine('WHO %s' % ievent.channel)
-    modes = bot.userlist[ievent.channel][ievent.nick]
+    modes = bot.userlist[ievent.channel.lower()][ievent.nick]
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \
