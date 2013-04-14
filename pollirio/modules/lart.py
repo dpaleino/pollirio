@@ -104,19 +104,29 @@ def lart(bot, ievent):
 @expose("lartignore", 1)
 def lartignore(bot, ievent):
     """lartignore <utente>"""
-
-    if len(ievent.args):
-        ignores.add(ievent.args[0], ievent.nick)
-        bot.msg(choose_dest(ievent), '%s: cot' % ievent.nick)
+    bot.sendLine('WHO %s' % ievent.channel)
+    modes = bot.userlist[ievent.channel][ievent.nick]
+    if '~' in modes or \
+      '&' in modes or \
+      '@' in modes or \
+      ievent.nick == 'dapal':
+        if len(ievent.args):
+            ignores.add(ievent.args[0], ievent.nick)
+            bot.msg(choose_dest(ievent), '%s: cot' % ievent.nick)
     return
 
 @expose("lartallow", 1)
 def lartllow(bot, ievent):
     """lartallow <utente>"""
-
-    if len(ievent.args):
-        ignores.delete(ievent.args[0], ievent.nick)
-        bot.msg(choose_dest(ievent), '%s: cot' % ievent.nick)
+    bot.sendLine('WHO %s' % ievent.channel)
+    modes = bot.userlist[ievent.channel][ievent.nick]
+    if '~' in modes or \
+      '&' in modes or \
+      '@' in modes or \
+      ievent.nick == 'dapal':
+        if len(ievent.args):
+            ignores.delete(ievent.args[0], ievent.nick)
+            bot.msg(choose_dest(ievent), '%s: cot' % ievent.nick)
     return
 
 @expose("lartami")
@@ -129,34 +139,30 @@ def selflart(bot, ievent):
 def lartadd(bot, ievent):
     """lart-add <testo contenente $who>"""
     args = ievent.msg.split(" ", 1)
-    if ievent.nick != 'dapal':
-        bot.msg(choose_dest(ievent), '%s: solo dapal PUÒ.' % ievent.nick)
-        return
-
-    if len(args) == 1:
-        bot.msg(choose_dest(ievent), "%s: cosa devo aggiungere?" % ievent.nick)
-        return
-
-    id = larts.add(args[1])
-    bot.msg(choose_dest(ievent), "%s: lart %s aggiunto." % (ievent.nick, id))
+    bot.sendLine('WHO %s' % ievent.channel)
+    modes = bot.userlist[ievent.channel][ievent.nick]
+    if '~' in modes or \
+      '&' in modes or \
+      '@' in modes or \
+      ievent.nick == 'dapal':
+        id = larts.add(args[1])
+        bot.msg(choose_dest(ievent), "%s: lart %s aggiunto." % (ievent.nick, id))
     return
 
 @expose("lart-del", 1)
 def lartdel(bot, ievent):
     """lart-del <id del lart>"""
-    if ievent.nick != 'dapal':
-        bot.msg(choose_dest(ievent), '%s: solo dapal PUÒ.' % ievent.nick)
-        return
-
-    if not ievent.args:
-        bot.msg(ievent.channel, "%s: cosa devo cancellare?" % ievent.nick)
-        return
-
-    id = int(ievent.args[0])
-    if larts.delete(id):
-        bot.msg(choose_dest(ievent), "%s: lart %s cancellato." % (ievent.nick, id))
-    else:
-        bot.msg(choose_dest(ievent), "%s: impossibile cancellare lart %s." % (ievent.nick, id))
+    bot.sendLine('WHO %s' % ievent.channel)
+    modes = bot.userlist[ievent.channel][ievent.nick]
+    if '~' in modes or \
+      '&' in modes or \
+      '@' in modes or \
+      ievent.nick == 'dapal':
+        id = int(ievent.args[0])
+        if larts.delete(id):
+            bot.msg(choose_dest(ievent), "%s: lart %s cancellato." % (ievent.nick, id))
+        else:
+            bot.msg(choose_dest(ievent), "%s: impossibile cancellare lart %s." % (ievent.nick, id))
     return
 
 @expose("lart-search", 1)
