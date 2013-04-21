@@ -269,4 +269,39 @@ def rankup(bot, ievent):
 
     bot.msg(choose_dest(ievent), msg)
 
+@expose('party', 1)
+def party(bot, ievent):
+    '''party <abbreviazione partito>'''
+    party = ievent.args[0]
+    parties = {
+        'ler': 4010,
+        'letr': 4010,
+        'fdi': 4147,
+        'fdei': 4147,
+        'pce': 872,
+        'rei': 3878,
+        'aetg': 641,
+        'lgei': 2540,
+        'pdl': 4287,
+        'crescere': 3088,
+        'lei': 2191,
+        'ieso': 3060,
+    }
+    party_id = parties[party]
+    party = request('party', id=party_id)
+    bot.msg(
+        choose_dest(ievent),
+        '\x02Nome partito:\x0F %s ' \
+        '\x02Membri:\x0F %s ' \
+        '\x02PP:\x0F %s ' \
+        '\x02CM:\x0F %d (%.2f%%)' %
+        (
+            party['name'],
+            party['members'],
+            party['president']['name'],
+            party['congress']['members'],
+            party['congress']['share']
+        )
+    )
+
 ## https://docs.google.com/document/pub?id=1WYgNCGj-TO0e0PJU4j_Pl9gjbgs70O5Glt3x-7XMg3A
