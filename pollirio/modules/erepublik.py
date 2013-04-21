@@ -294,13 +294,12 @@ def party(bot, ievent):
         '\x02Nome partito:\x0F %s ' \
         '\x02Membri:\x0F %s ' \
         '\x02PP:\x0F %s ' \
-        '\x02CM:\x0F %d (%.2f%%)' %
+        '\x02CM:\x0F %d' %
         (
             party['name'],
             party['members'],
             party['president']['name'],
-            party['congress']['members'],
-            party['congress']['share']
+            party['congress']['members']
         )
     )
 
