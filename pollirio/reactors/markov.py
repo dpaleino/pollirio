@@ -24,21 +24,28 @@ def update_chains(lines, alternative=False):
                     prev_word = cur_word
                     has_prev = True
                 else:
+                    chain = 'all'
                     if alternative:
-                        markov_chains['fanculo'].setdefault(prev_word, []).append(cur_word)
+                        chain = 'fanculo'
+                    if prev_word in markov_chains[chain]:
+                        if cur_word in markov_chains[chain][prev_word]:
+                            markov_chains[chain][prev_word][cur_word] += 1
+                        else:
+                            markov_chains[chain][prev_word][cur_word] = 1
                     else:
-                        markov_chains['all'].setdefault(prev_word, []).append(cur_word)
+                        markov_chains[chain][prev_word] = {cur_word: 1}
+                    #~ markov_chains[chain].setdefault(prev_word, []).append(cur_word)
+
                     prev_word = cur_word
 
 def make_sentence(words=None, alternative=False):
     while True:
         if not words:
             keys = markov_chains['all'].keys()
+            additional_keys = []
             if alternative:
                 additional_keys = [x for x in markov_chains['fanculo'].keys() if x not in keys]
-                word = random.choice(keys + additional_keys)
-            else:
-                word = random.choice(keys)
+            word = random.choice(keys + additional_keys)
         else:
             word = random.choice(words)
         if word[-1] not in ('.','?'):
@@ -46,15 +53,15 @@ def make_sentence(words=None, alternative=False):
     generated_sentence = word.capitalize()
     while word[-1] not in ('.','?'):
         try:
-            subchain = markov_chains['all'][word]
+            threshold = int(round(sum(markov_chains['all'][word].values()) / (len(markov_chains['all'][word].values()) * 1.0)))
+            subchain = [x[0] for x in markov_chains['all'][word].items() if x[1] >= threshold]
+            additional_subchain = []
             if alternative:
                 try:
-                    additional_subchain = [x for x in markov_chains['fanculo'][word] if x not in subchain]
+                    additional_subchain = [x[0] for x in markov_chains['fanculo'][word].items() if x[0] not in subchain and x[1] >= threshold]
                 except KeyError:
-                    additional_subchain = []
-                newword = random.choice(subchain + additional_subchain)
-            else:
-                newword = random.choice(subchain)
+                    pass
+            newword = random.choice(subchain + additional_subchain)
             generated_sentence += ' '+newword
             word = newword #TODO fix possible crash if this is not a key (last word parsed)
         except KeyError:
