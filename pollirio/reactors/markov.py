@@ -74,7 +74,7 @@ def learn(bot, ievent):
     if ievent.msg.startswith(conf.nickname) or (ievent.channel == '#fanculo' and conf.nickname in ievent.msg):
         if ievent.channel == '#fanculo':
             # learn from here too, unless a bot is speaking
-            if ievent.nick not in ['godzilla', 'parrot']:
+            if ievent.nick not in ['godzilla', 'parrot', 'RedBot']:
                 update_chains([ievent.msg.replace(conf.nickname, '')], True)
             words = ievent.msg.replace(conf.nickname, '').split()
             talk(bot, ievent, words, True)
