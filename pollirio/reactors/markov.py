@@ -5,6 +5,7 @@ from pollirio import conf, choose_dest
 
 import random
 import cPickle
+import string
 
 markov_data = 'data/markov.pkl'
 try:
@@ -24,6 +25,9 @@ def update_chains(lines, alternative=False):
                     prev_word = cur_word
                     has_prev = True
                 else:
+                    if prev_word == cur_word:
+                        # avoid infinite loops
+                        continue
                     chain = 'all'
                     if alternative:
                         chain = 'fanculo'
@@ -55,16 +59,24 @@ def make_sentence(words=None, alternative=False):
         try:
             threshold = int(round(sum(markov_chains['all'][word].values()) / (len(markov_chains['all'][word].values()) * 1.0)))
             subchain = [x[0] for x in markov_chains['all'][word].items() if x[1] >= threshold]
+            try:
+                subchain.remove(word)
+            except ValueError:
+                pass
             additional_subchain = []
             if alternative:
                 try:
                     additional_subchain = [x[0] for x in markov_chains['fanculo'][word].items() if x[0] not in subchain and x[1] >= threshold]
+                    try:
+                        additional_subchain.remove(word)
+                    except ValueError:
+                        pass
                 except KeyError:
                     pass
             newword = random.choice(subchain + additional_subchain)
             generated_sentence += ' '+newword
             word = newword #TODO fix possible crash if this is not a key (last word parsed)
-        except KeyError:
+        except (KeyError, IndexError):
             generated_sentence += '.'
             word = '.'
     return generated_sentence
@@ -72,14 +84,19 @@ def make_sentence(words=None, alternative=False):
 @expose('.*')
 def learn(bot, ievent):
     if ievent.msg.startswith(conf.nickname) or (ievent.channel == '#fanculo' and conf.nickname in ievent.msg):
+        punct = string.punctuation.replace('_', '')
+        punct = punct.replace('|', '')
+        punct = punct.replace('-', '')
+        msg = ievent.msg.translate(string.maketrans('', ''), punct)
+        words = msg.replace(conf.nickname, '').split()
+
         if ievent.channel == '#fanculo':
             # learn from here too, unless a bot is speaking
             if ievent.nick not in ['godzilla', 'parrot', 'RedBot']:
                 update_chains([ievent.msg.replace(conf.nickname, '')], True)
-            words = ievent.msg.replace(conf.nickname, '').split()
             talk(bot, ievent, words, True)
         else:
-            talk(bot, ievent)
+            talk(bot, ievent, words)
         return
 
     if ievent.channel.startswith('#'):
