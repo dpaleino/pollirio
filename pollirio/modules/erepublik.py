@@ -286,6 +286,7 @@ def party(bot, ievent):
         'crescere': 3088,
         'lei': 2191,
         'ieso': 3060,
+        'puv': 3166,
     }
     party_id = parties[party]
     party = request('party', id=party_id)
