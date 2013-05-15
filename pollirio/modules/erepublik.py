@@ -283,10 +283,15 @@ def party(bot, ievent):
         'aetg': 641,
         'lgei': 2540,
         'pdl': 4287,
-        'crescere': 3088,
+        'bastardi': 3088,
+        'bsg': 3088,
         'lei': 2191,
         'ieso': 3060,
         'puv': 3166,
+        'movimento': 2360,
+        'pmi': 2687,
+        'api': 4276,
+        'pdl': 4287,
     }
     party_id = parties[party]
     party = request('party', id=party_id)
