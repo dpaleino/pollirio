@@ -43,3 +43,4 @@ from misc import *
 from channel import *
 from quotes import *
 from erepublik import *
+from erep_ei import *
