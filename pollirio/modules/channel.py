@@ -14,7 +14,7 @@ def mass(bot, ievent, msg=None):
       '&' in modes or \
       '@' in modes or \
       ievent.nick == 'dapal':
-        users = bot.userlist[ievent.channel.lower()].keys()
+        users = sorted(bot.userlist[ievent.channel.lower()].keys())
         bot.msg(ievent.channel, ' '.join(users))
         if msg:
             bot.msg(ievent.channel, '\x02%s\x0F' % msg)
