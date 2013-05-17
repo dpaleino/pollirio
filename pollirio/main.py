@@ -170,7 +170,7 @@ class MyBot(irc.IRCClient):
         ch = channel[1:].lower()
         if ch in self.loggers.keys():
             self.loggers[ch].log("-!- %s joined %s" % (user, channel))
-        self.sendLine('WHO %s' % ievent.channel)
+        self.sendLine('WHO %s' % channel)
 
     # callback
     def userLeft(self, user, channel):
