@@ -170,6 +170,7 @@ class MyBot(irc.IRCClient):
         ch = channel[1:].lower()
         if ch in self.loggers.keys():
             self.loggers[ch].log("-!- %s joined %s" % (user, channel))
+        self.sendLine('WHO %s' % ievent.channel)
 
     # callback
     def userLeft(self, user, channel):
@@ -181,8 +182,8 @@ class MyBot(irc.IRCClient):
         if self.userlist.has_key(channel.lower()):
             try:
                 del self.userlist[channel.lower()][user]
-            except KeyError:
-                pass
+            except KeyError as ex:
+                print ex
 
     # callback
     def userQuit(self, user, msg):
@@ -204,8 +205,8 @@ class MyBot(irc.IRCClient):
         if self.userlist.has_key(channel.lower()):
             try:
                 del self.userlist[channel.lower()][kickee]
-            except KeyError:
-                pass
+            except KeyError as ex:
+                print ex
 
     # callback
     def modeChanged(self, user, channel, set, modes, args):
