@@ -52,11 +52,15 @@ def request(resource, **args):
     }
     if resource not in patterns:
         return None
+    counter = 0
     while True:
         try:
             ret = urlopen(api_url + patterns[resource] % args + '.json?key=%s' % api_key)
         except HTTPError:
             sleep(1)
+            counter += 1
+            if counter == 60:
+                break
             continue
         break
     return json.decode(''.join(ret.readlines()))
