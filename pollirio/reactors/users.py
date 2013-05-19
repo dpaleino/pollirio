@@ -57,3 +57,16 @@ def erre(bot, ievent):
 @expose('favola fox')
 def favola_fox(bot, ievent):
     bot.msg(choose_dest(ievent), '%s: favola fox troia' % ievent.nick)
+
+@expose('awedxz')
+@expose('aweddiano')
+def awedxz(bot, ievent):
+    sentences = [
+        'son tuti terùn chi, eh awedxz?',
+        'hey awedxz, hai sentito della storia tra Turid e x3rr3x?',
+        "awedxz smettila di fappare, c'è gente che ti chiama!",
+        'non pingarlo, tanto awedxz se ne catafotte.',
+    ]
+    msg = randomize_msg(sentences)
+    if msg:
+        bot.msg(choose_dest(ievent), msg)
