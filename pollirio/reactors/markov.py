@@ -57,7 +57,7 @@ def make_sentence(words=None, alternative=False):
     generated_sentence = word.capitalize()
     while word[-1] not in ('.','?'):
         try:
-            threshold = int(round(sum(markov_chains['all'][word].values()) / (len(markov_chains['all'][word].values()) * 1.0)))
+            threshold = int(round(sum(markov_chains['all'][word].values()) / (len(markov_chains['all'][word].values()) * 0.25)))
             subchain = [x[0] for x in markov_chains['all'][word].items() if x[1] >= threshold]
             try:
                 subchain.remove(word)
