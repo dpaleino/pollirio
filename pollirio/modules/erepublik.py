@@ -244,6 +244,10 @@ def rankup(bot, ievent):
         100000000: 'God of War*',
         200000000: 'God of War**',
         500000000: 'God of War***',
+        1000000000: 'Titan',
+        2000000000: 'Titan*',
+        4000000000: 'Titan**',
+        10000000000: 'Titan***',
     }
 
     if len(ievent.args) == 0:
