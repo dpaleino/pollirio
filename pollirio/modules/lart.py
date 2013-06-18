@@ -175,6 +175,9 @@ def lartsearch(bot, ievent):
         return
 
     query = args[1]
+    if len(query) < 3:
+        bot.msg(choose_dest(ievent), '%s: il termine di ricerca deve contenere almeno 3 caratteri.')
+        return
     for id, lart in larts.search(query):
         bot.msg(choose_dest(ievent), "#%s: %s" % (id, lart.encode("utf-8")))
         time.sleep(0.75)
