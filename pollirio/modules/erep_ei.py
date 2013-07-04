@@ -4,6 +4,7 @@ from pollirio.modules import expose
 from pollirio.dbutils import *
 from pollirio import choose_dest
 from pollirio import conf
+from erepublik import get_uid
 
 def reclute_link(bot, ievent, link):
     if ievent.channel not in ['#reclute-war']:
@@ -33,3 +34,14 @@ def lavoro(bot, ievent):
 @expose('equip')
 def equip(bot, ievent):
     reclute_link(bot, ievent, 'http://tinyurl.com/EI-equip-160513')
+
+@expose('profilo')
+def ei_profilo(bot, ievent):
+    if len(ievent.args) == 0:
+        user = ievent.nick
+    else:
+        user = ' '.join(ievent.args)
+    user_id = get_uid(bot, ievent, user)
+    if not user_id:
+        return
+    bot.msg(choose_dest(ievent), '%s: http://ei-manage.hanskalabs.net/users/view/%s' % (ievent.nick, user_id))
