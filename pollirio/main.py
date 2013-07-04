@@ -49,6 +49,7 @@ class MyBot(irc.IRCClient):
     nickname = property(_get_nickname)
 
     userlist = {}
+    userlist_ready = False
 
     # override IRCClient's methods, just to get them logged
     def msg(self, channel, message):
@@ -63,6 +64,11 @@ class MyBot(irc.IRCClient):
         ch = channel[1:].lower()
         if ch in self.loggers.keys():
             self.loggers[ch].log("* %s %s" % (conf.nickname, message))
+
+    def lineReceived(self, line):
+        irc.IRCClient.lineReceived(self, line)
+        if 'End of /WHO' in line:
+            self.userlist_ready = True
 
     # callback
     def connectionMade(self):
@@ -99,6 +105,7 @@ class MyBot(irc.IRCClient):
 
     # callback
     def irc_RPL_WHOREPLY(self, *nargs):
+        self.userlist_ready = False
         server, values = nargs
         channel = values[1]
         nickname = values[5]
@@ -108,6 +115,7 @@ class MyBot(irc.IRCClient):
 
     # callback
     def irc_RPL_ENDOFWHO(self, *nargs):
+        self.userlist_ready = True
         #~ print self.userlist
         pass
         # ~ = proprietario
@@ -216,6 +224,10 @@ class MyBot(irc.IRCClient):
             if not subject:
                 return
 
+            # I don't care about bans here.
+            if 'b' in modes:
+                return
+
             # TODO: owner e admin sono settabili/revocabili? IMHO no.
             umodes = []
             if 'o' in modes:
@@ -228,6 +240,7 @@ class MyBot(irc.IRCClient):
             if set:
                 # modes being added
                 self.userlist[channel.lower()][subject] += ''.join(umodes)
+                print self.userlist[channel.lower()][subject]
             else:
                 # modes being removed
                 for m in umodes:
