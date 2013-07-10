@@ -33,7 +33,7 @@ def lavoro(bot, ievent):
 
 @expose('equip')
 def equip(bot, ievent):
-    reclute_link(bot, ievent, 'http://tinyurl.com/EI-equip-160513')
+    reclute_link(bot, ievent, 'https://docs.google.com/spreadsheet/pub?key=0Al3dpy2z26cLdFp5RHBXYlhuaUo4TDdTVEc3Mk83X1E')
 
 @expose('profilo')
 def ei_profilo(bot, ievent):
