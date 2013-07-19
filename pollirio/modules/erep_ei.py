@@ -15,6 +15,7 @@ def reclute_link(bot, ievent, link):
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \
+      '+' in modes or \
       ievent.nick == 'dapal':
         if len(ievent.args):
             nick = ievent.args[0]
