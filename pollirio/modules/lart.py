@@ -97,6 +97,15 @@ def lart(bot, ievent):
         bot.msg(ievent.channel, "%s autolartati, non esiste quel lart!" % ievent.nick)
         return
 
+    if ievent.channel in ['#reclute-war']:
+        bot.sendLine('WHO %s' % ievent.channel)
+        modes = bot.userlist[ievent.channel.lower()][ievent.nick]
+        if '~' not in modes and \
+           '&' not in modes and \
+           '@' not in modes and \
+            ievent.nick != 'dapal':
+             return
+
     lart = lart.replace("$who", ievent.args[0]).encode("utf-8")
     bot.describe(ievent.channel, lart)
     return
