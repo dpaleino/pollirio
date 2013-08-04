@@ -104,6 +104,7 @@ def lart(bot, ievent):
            '&' not in modes and \
            '@' not in modes and \
            '%' not in modes and \
+           '+' not in modes and \
            ievent.nick != 'dapal':
             bot.msg(choose_dest(ievent), '%s: PVPPA' % ievent.nick)
             return

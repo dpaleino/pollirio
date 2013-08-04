@@ -13,6 +13,7 @@ def mass(bot, ievent, msg=None):
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \
+      '%' in modes or \
       ievent.nick == 'dapal':
         users = sorted(bot.userlist[ievent.channel.lower()].keys())
         bot.msg(ievent.channel, ' '.join(users))
