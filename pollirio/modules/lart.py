@@ -103,8 +103,10 @@ def lart(bot, ievent):
         if '~' not in modes and \
            '&' not in modes and \
            '@' not in modes and \
-            ievent.nick != 'dapal':
-             return
+           '%' not in modes and \
+           ievent.nick != 'dapal':
+            bot.msg(choose_dest(ievent), '%s: PVPPA' % ievent.nick)
+            return
 
     lart = lart.replace("$who", ievent.args[0]).encode("utf-8")
     bot.describe(ievent.channel, lart)
@@ -118,10 +120,13 @@ def lartignore(bot, ievent):
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \
+      '%' in modes or \
       ievent.nick == 'dapal':
         if len(ievent.args):
             ignores.add(ievent.args[0], ievent.nick)
             bot.msg(choose_dest(ievent), '%s: cot' % ievent.nick)
+    else:
+        bot.msg(choose_dest(ievent), '%s: PVPPA' % ievent.nick)
     return
 
 @expose("lartallow", 1)
@@ -132,10 +137,13 @@ def lartllow(bot, ievent):
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \
+      '%' in modes or \
       ievent.nick == 'dapal':
         if len(ievent.args):
             ignores.delete(ievent.args[0], ievent.nick)
             bot.msg(choose_dest(ievent), '%s: cot' % ievent.nick)
+    else:
+        bot.msg(choose_dest(ievent), '%s: PVPPA' % ievent.nick)
     return
 
 @expose("lartami")
