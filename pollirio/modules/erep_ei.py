@@ -34,7 +34,11 @@ def lavoro(bot, ievent):
 
 @expose('equip')
 def equip(bot, ievent):
-    reclute_link(bot, ievent, 'https://docs.google.com/spreadsheet/pub?key=0Al3dpy2z26cLdFp5RHBXYlhuaUo4TDdTVEc3Mk83X1E')
+    reclute_link(bot, ievent, 'https://docs.google.com/spreadsheet/ccc?key=0Al3dpy2z26cLdGkyMzJRWlJqcW9vMHhpWmU1OG1Ka3c')
+
+@expose('equipform')
+def equip_form(bot, ievent):
+    reclute_link(bot, ievent, 'http://ei-manage.hanskalabs.net/equip/form')
 
 @expose('profilo')
 def ei_profilo(bot, ievent):
