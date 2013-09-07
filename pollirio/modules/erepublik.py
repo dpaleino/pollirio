@@ -320,11 +320,11 @@ def rankup(bot, ievent):
 
     next_rank_inf = 0
     for inf in sorted(rankings.keys()):
-        if inf >= profile['militaryAttributes']['rank_points']:
+        if inf >= int(profile['militaryAttributes']['rank_points']):
             next_rank_inf = inf
             break
     next_rank = rankings[next_rank_inf]
-    req_inf = (next_rank_inf - profile['militaryAttributes']['rank_points']) * 10
+    req_inf = (next_rank_inf - int(profile['militaryAttributes']['rank_points'])) * 10
 
     hit = get_hit(profile['militaryAttributes']['strength'], profile['militaryAttributes']['rank_points'])
     hit_q0 = int(req_inf / hit)
