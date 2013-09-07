@@ -331,7 +331,7 @@ def rankup(bot, ievent):
     hit_q0 = 0
 
     msg = 'Prossimo rank per %s: \x02%s\x0F :: Inf richiesta: %d :: Q0: \x02%s\x0F :: Q1: \x02%s\x0F :: Q2: \x02%s\x0F :: Q3: \x02%s\x0F :: Q4: \x02%s\x0F :: Q5: \x02%s\x0F :: Q6: \x02%s\x0F :: Q7: \x02%s\x0F' % \
-        (profile['name'], next_rank, req_inf, hit_q0, int(hit_q0 / 1.2),
+        (profile['general']['name'], next_rank, req_inf, hit_q0, int(hit_q0 / 1.2),
          int(hit_q0 / 1.4), int(hit_q0 / 1.6), int(hit_q0 / 1.8),
          int(hit_q0 / 2), int(hit_q0 / 2.2), int(hit_q0 / 3))
 
