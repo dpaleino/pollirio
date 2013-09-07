@@ -6,9 +6,17 @@ from pollirio import choose_dest
 from pollirio import conf
 
 import cjson as json
-from urllib2 import urlopen, HTTPError
 from datetime import datetime
-from time import sleep
+from requests import session
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
+import hashlib
+import hmac
+import locale
+from lxml.html.soupparser import fromstring
+from pprint import pprint
 
 class UsersDb:
     def __init__(self):
@@ -27,51 +35,81 @@ class UsersDb:
 
 users = UsersDb()
 
-api_key = conf.config.get('erepublik', 'api_key')
-api_url = conf.config.get('erepublik', 'api_url')
+private = conf.config.get('erepublik', 'api_private')
+public = conf.config.get('erepublik', 'api_public')
+username = conf.config.get('erepublik', 'username')
+password = conf.config.get('erepublik', 'password')
 
-def request(resource, **args):
-    format = 'json' # or 'xml'
-    patterns = {
-        'citizen.profile': 'citizen/profile/%(id)d',
-        'citizen.search': 'citizen/search/%(query)s/%(page)d',
-        'battle.active': 'battle/active',
-        'battle': 'battle/%(id)d',
-        'country.society': 'country/%(country)s/society',
-        'country.economy': 'country/%(country)s/economy',
-        'party': 'party/%(id)d',
-        'mu': 'mu/%(id)d',
-        'mu.regiment': 'mu/%(id)d/%(regiment)d',
-        'market': 'market/%(country)s/%(industry)s/%(quality)d/%(page)d',
-        'job.market': 'jobmarket/%(country)s/%(page)d',
-        'exchange': 'exchange/%(mode)d/%(page)d',
-        'election.president': 'election/president/%(year)d/%(month)d/%(country)s',
-        'election.congress': 'election/congress/%(year)d/%(month)d/%(country)s/%(region)s',
-        'election.party': 'election/congress/%(year)d/%(month)d/%(country)s/%(party)d',
+locale.setlocale(locale.LC_ALL, 'C')
 
+def login():
+    payload = dict(
+        citizen_email = username,
+        citizen_password = password,
+        remember = 'on',
+    )
+
+    s = session()
+    s.post('http://www.erepublik.com/en/login', data=payload)
+    return s
+
+def request(resource, action, **args):
+    #oldlocale = locale.getlocale()
+    #locale.setlocale(locale.LC_ALL, 'C')
+
+    date = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S')
+    params = None
+    if args:
+        params = urlencode(args).lower()
+
+    query = ':'.join([x for x in [resource, action, params, date] if x is not None])
+    auth = hmac.new(private, query, hashlib.sha256).hexdigest()
+
+    s = session()
+    headers = {
+        'Date': date,
+        'Auth': '%s/%s' % (public, auth),
     }
-    if resource not in patterns:
-        return None
-    counter = 0
-    while True:
-        try:
-            ret = urlopen(api_url + patterns[resource] % args + '.json?key=%s' % api_key)
-        except HTTPError:
-            sleep(1)
-            counter += 1
-            if counter == 60:
-                break
-            continue
-        break
-    return json.decode(''.join(ret.readlines()))
+    page = s.get('http://api.erepublik.com/citizen/profile', params=args, headers=headers)
+    pprint(json.decode(page.text))
+    return json.decode(page.text)['message']
+
+def scrape(resource, **args):
+    session = login()
+
+    if resource == 'uid':
+        # we effectively only need the first user, so don't scrape all pages
+        search = session.get(
+            'http://www.erepublik.com/en/main/search/%s/' %
+                args['query'].replace(' ', '_')
+        )
+        doc = fromstring(search.text)
+        uid = doc.xpath('//div[@class="nameholder"]/a/@href')[0].split('/')[-1].strip()
+        return uid
+
+    #patterns = {
+        #'citizen.profile': 'citizen/profile/%(id)d',
+        #'citizen.search': 'citizen/search/%(query)s/%(page)d',
+        #'battle.active': 'battle/active',
+        #'battle': 'battle/%(id)d',
+        #'country.society': 'country/%(country)s/society',
+        #'country.economy': 'country/%(country)s/economy',
+        #'party': 'party/%(id)d',
+        #'mu': 'mu/%(id)d',
+        #'mu.regiment': 'mu/%(id)d/%(regiment)d',
+        #'market': 'market/%(country)s/%(industry)s/%(quality)d/%(page)d',
+        #'job.market': 'jobmarket/%(country)s/%(page)d',
+        #'exchange': 'exchange/%(mode)d/%(page)d',
+        #'election.president': 'election/president/%(year)d/%(month)d/%(country)s',
+        #'election.congress': 'election/congress/%(year)d/%(month)d/%(country)s/%(region)s',
+        #'election.party': 'election/congress/%(year)d/%(month)d/%(country)s/%(party)d',
 
 def get_uid(bot, ievent, user):
     ret = users.search(user)
     if ret:
         return int(ret[0][2])
-    data = request('citizen.search', query=user.replace(' ', '_'), page=1)
-    if data:
-        uid = data[0]['id']
+    uid = scrape('uid', query=user)
+    if uid:
         users.add(user, uid)
         return uid
     else:
@@ -87,13 +125,13 @@ def list_profile(bot, ievent):
     user_id = get_uid(bot, ievent, user)
     if not user_id:
         return
-    profile = request('citizen.profile', id=user_id)
-    age = datetime.now() - datetime.strptime(profile['birth'], '%Y-%m-%d')
+    profile = request('citizen', 'profile', citizenId=user_id)
+    age = datetime.now() - datetime.strptime(profile['general']['birthDay'], '%b %d, %Y')
 
     if not profile['party']:
-        profile['party']= {'name': 'Nessun partito'}
-    if not profile['army']:
-        profile['army'] = {'name': 'Nessuna MU'}
+        profile['party'] = {'name': 'Nessun partito'}
+    if not profile['militaryUnit']:
+        profile['militaryUnit'] = {'name': 'Nessuna MU'}
 
     bot.msg(
         choose_dest(ievent),
@@ -111,37 +149,38 @@ def list_profile(bot, ievent):
         '\x02MU:\x0F %s' %
         (
             user_id,
-            profile['level'],
+            profile['general']['level'],
             age.days,
-            profile['experience'],
-            profile['strength'],
-            profile['rank']['name'],
-            profile['rank']['points'],
-            profile['national_rank'],
-            profile['citizenship']['name'],
-            profile['residence']['country']['name'],
-            profile['residence']['region']['name'],
+            profile['general']['experience_points'],
+            profile['militaryAttributes']['strength'],
+            profile['militaryAttributes']['rank_name'] + '*'*profile['militaryAttributes']['rank_stars'],
+            profile['militaryAttributes']['rank_points'],
+            profile['general']['nationalRank'],
+            profile['location']['citizenship_country_initials'],
+            profile['location']['residence_country_name'],
+            profile['location']['residence_region_name'],
             profile['party']['name'],
-            profile['army']['name']
+            profile['militaryUnit']['name']
         )
     )
 
 @expose('fc')
 def fight_calc(bot, ievent):
-    if len(ievent.args) == 0:
-        user = ievent.nick
-    else:
-        user = ' '.join(ievent.args)
-    user_id = get_uid(bot, ievent, user)
-    if not user_id:
-        return
-    profile = request('citizen.profile', id=user_id)
-    hit = int(profile['hit'])
-    bot.msg(
-        choose_dest(ievent),
-        '%s: Inf Q0: \x02%s\x0F :: Q1: \x02%s\x0F :: Q2: \x02%s\x0F :: Q3: \x02%s\x0F :: Q4: \x02%s\x0F :: Q5: \x02%s\x0F :: Q6: \x02%s\x0F :: Q7: \x02%s\x0F' % \
-        (ievent.nick, hit, int(hit*1.2), int(hit*1.4), int(hit*1.6), int(hit*1.8), hit*2, int(hit*2.2), hit*3)
-    )
+    bot.msg(choose_dest(ievent), '%s: .fc non è al momento disponibile.' % ievent.nick)
+    #if len(ievent.args) == 0:
+        #user = ievent.nick
+    #else:
+        #user = ' '.join(ievent.args)
+    #user_id = get_uid(bot, ievent, user)
+    #if not user_id:
+        #return
+    #profile = request('citizen.profile', id=user_id)
+    #hit = int(profile['hit'])
+    #bot.msg(
+        #choose_dest(ievent),
+        #'%s: Inf Q0: \x02%s\x0F :: Q1: \x02%s\x0F :: Q2: \x02%s\x0F :: Q3: \x02%s\x0F :: Q4: \x02%s\x0F :: Q5: \x02%s\x0F :: Q6: \x02%s\x0F :: Q7: \x02%s\x0F' % \
+        #(ievent.nick, hit, int(hit*1.2), int(hit*1.4), int(hit*1.6), int(hit*1.8), hit*2, int(hit*2.2), hit*3)
+    #)
 
 @expose('link')
 def link_profile(bot, ievent):
@@ -155,7 +194,7 @@ def link_profile(bot, ievent):
     bot.msg(choose_dest(ievent), '%s: http://www.erepublik.com/en/citizen/profile/%s' % (ievent.nick, user_id))
 
 @expose('donate')
-def link_profile(bot, ievent):
+def donate(bot, ievent):
     if len(ievent.args) == 0:
         user = ievent.nick
     else:
@@ -164,6 +203,17 @@ def link_profile(bot, ievent):
     if not user_id:
         return
     bot.msg(choose_dest(ievent), '%s: http://www.erepublik.com/en/economy/donate-items/%s' % (ievent.nick, user_id))
+
+@expose('money')
+def money(bot, ievent):
+    if len(ievent.args) == 0:
+        user = ievent.nick
+    else:
+        user = ' '.join(ievent.args)
+    user_id = get_uid(bot, ievent, user)
+    if not user_id:
+        return
+    bot.msg(choose_dest(ievent), '%s: http://www.erepublik.com/en/economy/donate-money/%s' % (ievent.nick, user_id))
 
 @expose('egov')
 def egov_profile(bot, ievent):
@@ -257,18 +307,19 @@ def rankup(bot, ievent):
     user_id = get_uid(bot, ievent, user)
     if not user_id:
         return
-    profile = request('citizen.profile', id=user_id)
+    profile = request('citizen', 'profile', citizenId=user_id)
 
     next_rank_inf = 0
     for inf in sorted(rankings.keys()):
-        if inf >= profile['rank']['points']:
+        if inf >= profile['militaryAttributes']['rank_points']:
             next_rank_inf = inf
             break
     next_rank = rankings[next_rank_inf]
-    req_inf = (next_rank_inf - profile['rank']['points']) * 10
+    req_inf = (next_rank_inf - profile['militaryAttributes']['rank_points']) * 10
 
-    hit = int(profile['hit']) * 1.0
-    hit_q0 = int(req_inf / hit)
+    #hit = int(profile['hit']) * 1.0
+    #hit_q0 = int(req_inf / hit)
+    hit_q0 = 0
 
     msg = 'Prossimo rank per %s: \x02%s\x0F :: Inf richiesta: %d :: Q0: \x02%s\x0F :: Q1: \x02%s\x0F :: Q2: \x02%s\x0F :: Q3: \x02%s\x0F :: Q4: \x02%s\x0F :: Q5: \x02%s\x0F :: Q6: \x02%s\x0F :: Q7: \x02%s\x0F' % \
         (profile['name'], next_rank, req_inf, hit_q0, int(hit_q0 / 1.2),
@@ -280,41 +331,42 @@ def rankup(bot, ievent):
 @expose('party', 1)
 def party(bot, ievent):
     '''party <abbreviazione partito>'''
-    party = ievent.args[0]
-    parties = {
-        'ler': 4010,
-        'letr': 4010,
-        'fdi': 4147,
-        'fdei': 4147,
-        'pce': 872,
-        'rei': 3878,
-        'aetg': 641,
-        'lgei': 2540,
-        'pdl': 4287,
-        'bastardi': 3088,
-        'bsg': 3088,
-        'lei': 2191,
-        'ieso': 3060,
-        'puv': 3166,
-        'movimento': 2360,
-        'pmi': 2687,
-        'api': 4276,
-        'pdl': 4287,
-    }
-    party_id = parties[party]
-    party = request('party', id=party_id)
-    bot.msg(
-        choose_dest(ievent),
-        '\x02Nome partito:\x0F %s ' \
-        '\x02Membri:\x0F %s ' \
-        '\x02PP:\x0F %s ' \
-        '\x02CM:\x0F %d' %
-        (
-            party['name'],
-            party['members'],
-            party['president']['name'],
-            party['congress']['members']
-        )
-    )
+    bot.msg(choose_dest(ievent), '%s: .party non è al momento disponibile.' % ievent.nick)
+    #party = ievent.args[0]
+    #parties = {
+        #'ler': 4010,
+        #'letr': 4010,
+        #'fdi': 4147,
+        #'fdei': 4147,
+        #'pce': 872,
+        #'rei': 3878,
+        #'aetg': 641,
+        #'lgei': 2540,
+        #'pdl': 4287,
+        #'bastardi': 3088,
+        #'bsg': 3088,
+        #'lei': 2191,
+        #'ieso': 3060,
+        #'puv': 3166,
+        #'movimento': 2360,
+        #'pmi': 2687,
+        #'api': 4276,
+        #'pdl': 4287,
+    #}
+    #party_id = parties[party]
+    #party = request('party', id=party_id)
+    #bot.msg(
+        #choose_dest(ievent),
+        #'\x02Nome partito:\x0F %s ' \
+        #'\x02Membri:\x0F %s ' \
+        #'\x02PP:\x0F %s ' \
+        #'\x02CM:\x0F %d' %
+        #(
+            #party['name'],
+            #party['members'],
+            #party['president']['name'],
+            #party['congress']['members']
+        #)
+    #)
 
 ## https://docs.google.com/document/pub?id=1WYgNCGj-TO0e0PJU4j_Pl9gjbgs70O5Glt3x-7XMg3A
