@@ -143,7 +143,7 @@ def request(resource, action, **args):
         'Auth': '%s/%s' % (public, auth),
     }
     page = s.get('http://api.erepublik.com/citizen/profile', params=args, headers=headers)
-    pprint(json.decode(page.text))
+    #pprint(json.decode(page.text))
     return json.decode(page.text)['message']
 
 def scrape(resource, **args):
@@ -328,7 +328,6 @@ def rankup(bot, ievent):
 
     hit = get_hit(profile['militaryAttributes']['strength'], profile['militaryAttributes']['rank_points'])
     hit_q0 = int(req_inf / hit)
-    hit_q0 = 0
 
     msg = 'Prossimo rank per %s: \x02%s\x0F :: Inf richiesta: %d :: Q0: \x02%s\x0F :: Q1: \x02%s\x0F :: Q2: \x02%s\x0F :: Q3: \x02%s\x0F :: Q4: \x02%s\x0F :: Q5: \x02%s\x0F :: Q6: \x02%s\x0F :: Q7: \x02%s\x0F' % \
         (profile['general']['name'], next_rank, req_inf, hit_q0, int(hit_q0 / 1.2),
