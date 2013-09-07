@@ -42,6 +42,78 @@ password = conf.config.get('erepublik', 'password')
 
 locale.setlocale(locale.LC_ALL, 'C')
 
+rankings = {
+        0: 'Recruit',
+        15: 'Private',
+        45: 'Private*',
+        80: 'Private**',
+        120: 'Private***',
+        170: 'Corporal',
+        250: 'Corporal*',
+        350: 'Corporal**',
+        450: 'Corporal***',
+        600: 'Sergeant',
+        800: 'Sergeant*',
+        1000: 'Sergeant**',
+        1400: 'Sergeant***',
+        1850: 'Lieutenant',
+        2350: 'Lieutenant*',
+        3000: 'Lieutenant**',
+        3750: 'Lieutenant***',
+        5000: 'Captain',
+        6500: 'Captain*',
+        9000: 'Captain**',
+        12000: 'Captain***',
+        15500: 'Major',
+        20000: 'Major*',
+        25000: 'Major**',
+        31000: 'Major***',
+        40000: 'Commander',
+        52000: 'Commander*',
+        67000: 'Commander**',
+        85000: 'Commander***',
+        110000: 'Lt Colonel',
+        140000: 'Lt Colonel*',
+        180000: 'Lt Colonel**',
+        225000: 'Lt Colonel***',
+        285000: 'Colonel',
+        355000: 'Colonel*',
+        435000: 'Colonel**',
+        540000: 'Colonel***',
+        660000: 'General',
+        800000: 'General*',
+        950000: 'General**',
+        1140000: 'General***',
+        1350000: 'Field Marshal',
+        1600000: 'Field Marshal*',
+        1875000: 'Field Marshal**',
+        2185000: 'Field Marshal***',
+        2550000: 'Supreme Marshal',
+        3000000: 'Supreme Marshal*',
+        3500000: 'Supreme Marshal**',
+        4150000: 'Supreme Marshal***',
+        4900000: 'National Force',
+        5800000: 'National Force*',
+        7000000: 'National Force**',
+        9000000: 'National Force***',
+        11500000: 'World Class Force',
+        14500000: 'World Class Force*',
+        18000000: 'World Class Force**',
+        22000000: 'World Class Force***',
+        26500000: 'Legendary Force',
+        31500000: 'Legendary Force*',
+        37000000: 'Legendary Force**',
+        43000000: 'Legendary Force***',
+        50000000: 'God of War',
+        100000000: 'God of War*',
+        200000000: 'God of War**',
+        500000000: 'God of War***',
+        1000000000: 'Titan',
+        2000000000: 'Titan*',
+        4000000000: 'Titan**',
+        10000000000: 'Titan***',
+    }
+
 def login():
     payload = dict(
         citizen_email = username,
@@ -116,6 +188,15 @@ def get_uid(bot, ievent, user):
         bot.msg(choose_dest(ievent), '%s: utente «%s» non trovato.' % (ievent.nick, user))
         return None
 
+def get_hit(strength, rank_points):
+    level = 0
+    for points in sorted(list(rankings.keys())):
+        if points > int(rank_points):
+            break
+        level += 1
+    base_hit = 10 * (1 + float(strength) / 400.0) * (1 + level / 5.0)
+    return int(round(base_hit))
+
 @expose('lp')
 def list_profile(bot, ievent):
     if len(ievent.args) == 0:
@@ -166,21 +247,21 @@ def list_profile(bot, ievent):
 
 @expose('fc')
 def fight_calc(bot, ievent):
-    bot.msg(choose_dest(ievent), '%s: .fc non è al momento disponibile.' % ievent.nick)
-    #if len(ievent.args) == 0:
-        #user = ievent.nick
-    #else:
-        #user = ' '.join(ievent.args)
-    #user_id = get_uid(bot, ievent, user)
-    #if not user_id:
-        #return
-    #profile = request('citizen.profile', id=user_id)
-    #hit = int(profile['hit'])
-    #bot.msg(
-        #choose_dest(ievent),
-        #'%s: Inf Q0: \x02%s\x0F :: Q1: \x02%s\x0F :: Q2: \x02%s\x0F :: Q3: \x02%s\x0F :: Q4: \x02%s\x0F :: Q5: \x02%s\x0F :: Q6: \x02%s\x0F :: Q7: \x02%s\x0F' % \
-        #(ievent.nick, hit, int(hit*1.2), int(hit*1.4), int(hit*1.6), int(hit*1.8), hit*2, int(hit*2.2), hit*3)
-    #)
+    #bot.msg(choose_dest(ievent), '%s: .fc non è al momento disponibile.' % ievent.nick)
+    if len(ievent.args) == 0:
+        user = ievent.nick
+    else:
+        user = ' '.join(ievent.args)
+    user_id = get_uid(bot, ievent, user)
+    if not user_id:
+        return
+    profile = request('citizen', 'profile', citizenId=user_id)
+    hit = get_hit(profile['militaryAttributes']['strength'], profile['militaryAttributes']['rank_points'])
+    bot.msg(
+        choose_dest(ievent),
+        '%s: Inf Q0: \x02%s\x0F :: Q1: \x02%s\x0F :: Q2: \x02%s\x0F :: Q3: \x02%s\x0F :: Q4: \x02%s\x0F :: Q5: \x02%s\x0F :: Q6: \x02%s\x0F :: Q7: \x02%s\x0F' % \
+        (ievent.nick, hit, int(hit*1.2), int(hit*1.4), int(hit*1.6), int(hit*1.8), hit*2, int(hit*2.2), hit*3)
+    )
 
 @expose('link')
 def link_profile(bot, ievent):
@@ -228,78 +309,6 @@ def egov_profile(bot, ievent):
 
 @expose('rankup')
 def rankup(bot, ievent):
-    rankings = {
-        0: 'Recruit',
-        15: 'Private',
-        45: 'Private*',
-        80: 'Private**',
-        120: 'Private***',
-        170: 'Corporal',
-        250: 'Corporal*',
-        350: 'Corporal**',
-        450: 'Corporal***',
-        600: 'Sergeant',
-        800: 'Sergeant*',
-        1000: 'Sergeant**',
-        1400: 'Sergeant***',
-        1850: 'Lieutenant',
-        2350: 'Lieutenant*',
-        3000: 'Lieutenant**',
-        3750: 'Lieutenant***',
-        5000: 'Captain',
-        6500: 'Captain*',
-        9000: 'Captain**',
-        12000: 'Captain***',
-        15500: 'Major',
-        20000: 'Major*',
-        25000: 'Major**',
-        31000: 'Major***',
-        40000: 'Commander',
-        52000: 'Commander*',
-        67000: 'Commander**',
-        85000: 'Commander***',
-        110000: 'Lt Colonel',
-        140000: 'Lt Colonel*',
-        180000: 'Lt Colonel**',
-        225000: 'Lt Colonel***',
-        285000: 'Colonel',
-        355000: 'Colonel*',
-        435000: 'Colonel**',
-        540000: 'Colonel***',
-        660000: 'General',
-        800000: 'General*',
-        950000: 'General**',
-        1140000: 'General***',
-        1350000: 'Field Marshal',
-        1600000: 'Field Marshal*',
-        1875000: 'Field Marshal**',
-        2185000: 'Field Marshal***',
-        2550000: 'Supreme Marshal',
-        3000000: 'Supreme Marshal*',
-        3500000: 'Supreme Marshal**',
-        4150000: 'Supreme Marshal***',
-        4900000: 'National Force',
-        5800000: 'National Force*',
-        7000000: 'National Force**',
-        9000000: 'National Force***',
-        11500000: 'World Class Force',
-        14500000: 'World Class Force*',
-        18000000: 'World Class Force**',
-        22000000: 'World Class Force***',
-        26500000: 'Legendary Force',
-        31500000: 'Legendary Force*',
-        37000000: 'Legendary Force**',
-        43000000: 'Legendary Force***',
-        50000000: 'God of War',
-        100000000: 'God of War*',
-        200000000: 'God of War**',
-        500000000: 'God of War***',
-        1000000000: 'Titan',
-        2000000000: 'Titan*',
-        4000000000: 'Titan**',
-        10000000000: 'Titan***',
-    }
-
     if len(ievent.args) == 0:
         user = ievent.nick
     else:
@@ -317,8 +326,8 @@ def rankup(bot, ievent):
     next_rank = rankings[next_rank_inf]
     req_inf = (next_rank_inf - profile['militaryAttributes']['rank_points']) * 10
 
-    #hit = int(profile['hit']) * 1.0
-    #hit_q0 = int(req_inf / hit)
+    hit = get_hit(profile['militaryAttributes']['strength'], profile['militaryAttributes']['rank_points'])
+    hit_q0 = int(req_inf / hit)
     hit_q0 = 0
 
     msg = 'Prossimo rank per %s: \x02%s\x0F :: Inf richiesta: %d :: Q0: \x02%s\x0F :: Q1: \x02%s\x0F :: Q2: \x02%s\x0F :: Q3: \x02%s\x0F :: Q4: \x02%s\x0F :: Q5: \x02%s\x0F :: Q6: \x02%s\x0F :: Q7: \x02%s\x0F' % \
