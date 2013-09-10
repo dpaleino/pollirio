@@ -40,6 +40,74 @@ def equip(bot, ievent):
 def equip_form(bot, ievent):
     reclute_link(bot, ievent, 'http://ei-manage.hanskalabs.net/equip/form')
 
+@expose('guida')
+def guida(bot, ievent):
+    if ievent.channel.lower() not in ['#reclute-war', '#accademia-ei', '#erep-war']:
+        return
+
+    topics = [
+        'organizzazione',
+        'equip',
+        'regole',
+        'primipassi',
+        'registrazione',
+        'chat',
+        'dovespostarsi',
+        'do',
+        'mercenari',
+    ]
+    if len(ievent.args) == 0:
+        bot.msg(
+            choose_dest(ievent),
+            '%s: guide disponibili: ' + ', '.join(topics) + '.'
+        )
+        return
+    elif len(ievent.args) == 2:
+        nick = ievent.args[1]
+    else:
+        nick = ievent.nick
+
+    topic = ievent.args[0]
+    if topic not in topics:
+        bot.msg(
+            choose_dest(ievent),
+            '%s: guida "%s" non disponibile.' % (nick, topic)
+        )
+    else:
+        msg = ''
+        if topic == 'organizzazione':
+            title = 'Come è fatto: Esercito eItaliano'
+            url = 'http://www.erepublik.com/it/article/2229405/1/20'
+        elif topic == 'equip':
+            title = 'Come è fatto: Equipaggimento, rimborsi e finanziamenti'
+            url = 'http://www.erepublik.com/it/article/2229877/1/20'
+        elif topic == 'regole':
+            title = 'Regole da rispettare'
+            url = 'http://www.erepublik.com/it/article/2300007/1/20'
+        elif topic == 'primipassi':
+            title = 'Primi Passi nel gioco'
+            url = 'http://www.erepublik.com/it/article/2300767/1/20'
+        elif topic == 'registrazione':
+            title = 'Registrazione in chat: Mibbit e Rizon'
+            url = 'http://www.erepublik.com/it/article/2233887/1/20'
+        elif topic == 'chat':
+            title = 'Perché stare in chat?'
+            url = 'http://www.erepublik.com/it/article/2265417/1/20'
+        elif topic == 'dovespostarsi':
+            title = 'Guerre dirette e RW: dove mi sposto?'
+            url = 'http://www.erepublik.com/it/article/2269933/1/20'
+        elif topic == 'do':
+            title = 'Il Daily Order, l\'ordine militare giornaliero'
+            url = 'http://www.erepublik.com/it/article/2271419/1/20'
+        elif topic == 'mercenari':
+            title = 'Un colpo di bazooka e un #mercenaries'
+            url = 'http://www.erepublik.com/it/article/2280072/1/20'
+
+        bot.msg(
+            choose_dest(ievent),
+            '%s: \x02%s\x0F - %s' % (nick, title.decode('utf-8'), url)
+        )
+
 @expose('profilo')
 def ei_profilo(bot, ievent):
     if len(ievent.args) == 0:
