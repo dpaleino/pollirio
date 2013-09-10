@@ -7,7 +7,7 @@ from pollirio import conf
 from erepublik import get_uid
 
 def reclute_link(bot, ievent, link):
-    if ievent.channel not in ['#reclute-war']:
+    if ievent.channel.lower() not in ['#reclute-war', '#accademia-ei', '#erep-war']:
         return
 
     bot.sendLine('WHO %s' % ievent.channel)
