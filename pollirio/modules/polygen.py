@@ -65,8 +65,9 @@ def poly(bot, ievent):
         p = Popen(["polygen", grammar], stdout=PIPE)
         reply = " ".join(filter(lambda x: x, p.communicate())).replace("\n", " ").strip()
         text = strip_tags(reply)
-        if ievent.args[0] not in ['melissap', 'teen', 'teen2', 'studioaperto']:
-            text = trunc(text)
+        if ievent.channel not in ['#pollo']:
+            if ievent.args[0] not in ['melissap', 'teen', 'teen2', 'studioaperto']:
+                text = trunc(text)
         bot.msg(choose_dest(ievent), "%s: %s" % (ievent.nick, text))
     except:
         bot.msg(choose_dest(ievent), "%s: non posso dirti nulla di nuovo, c'è stato un errore..." % ievent.nick)
