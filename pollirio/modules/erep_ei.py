@@ -15,7 +15,7 @@ def reclute_link(bot, ievent, link):
     if '~' in modes or \
       '&' in modes or \
       '@' in modes or \
-      '+' in modes or \
+      '%' in modes or \
       ievent.nick == 'dapal':
         if len(ievent.args):
             nick = ievent.args[0]
@@ -34,7 +34,7 @@ def lavoro(bot, ievent):
 
 @expose('equip')
 def equip(bot, ievent):
-    reclute_link(bot, ievent, 'https://docs.google.com/spreadsheet/ccc?key=0Al3dpy2z26cLdGkyMzJRWlJqcW9vMHhpWmU1OG1Ka3c')
+    reclute_link(bot, ievent, 'http://tinyurl.com/EIequip14102013')
 
 @expose('equipform')
 def equip_form(bot, ievent):
@@ -42,7 +42,7 @@ def equip_form(bot, ievent):
 
 @expose('guida')
 def guida(bot, ievent):
-    if ievent.channel.lower() not in ['#reclute-war', '#accademia-ei', '#erep-war']:
+    if ievent.channel.lower() not in ['#reclute-war', '#accademia-ei', '#erep-war', '#ei-tech']:
         return
 
     topics = [
@@ -56,16 +56,16 @@ def guida(bot, ievent):
         'do',
         'mercenari',
     ]
+    nick = ievent.nick
     if len(ievent.args) == 0:
         bot.msg(
             choose_dest(ievent),
-            '%s: guide disponibili: ' + ', '.join(topics) + '.'
+            '%s: guide disponibili: ' % nick + ', '.join(topics) + '.'
         )
         return
-    elif len(ievent.args) == 2:
+
+    if len(ievent.args) == 2:
         nick = ievent.args[1]
-    else:
-        nick = ievent.nick
 
     topic = ievent.args[0]
     if topic not in topics:
@@ -79,7 +79,7 @@ def guida(bot, ievent):
             title = 'Come è fatto: Esercito eItaliano'
             url = 'http://www.erepublik.com/it/article/2229405/1/20'
         elif topic == 'equip':
-            title = 'Come è fatto: Equipaggimento, rimborsi e finanziamenti'
+            title = 'Come è fatto: Equipaggiamento, rimborsi e finanziamenti'
             url = 'http://www.erepublik.com/it/article/2229877/1/20'
         elif topic == 'regole':
             title = 'Regole da rispettare'
@@ -105,7 +105,7 @@ def guida(bot, ievent):
 
         bot.msg(
             choose_dest(ievent),
-            '%s: \x02%s\x0F - %s' % (nick, title.decode('utf-8'), url)
+            '%s: \x02%s\x0F - %s' % (nick, title, url)
         )
 
 @expose('profilo')
