@@ -180,11 +180,11 @@ def get_uid(bot, ievent, user):
     ret = users.search(user)
     if ret:
         return int(ret[0][2])
-    uid = scrape('uid', query=user)
-    if uid:
+    try:
+        uid = scrape('uid', query=user)
         users.add(user, uid)
         return uid
-    else:
+    except IndexError:
         bot.msg(choose_dest(ievent), '%s: utente «%s» non trovato.' % (ievent.nick, user))
         return None
 
