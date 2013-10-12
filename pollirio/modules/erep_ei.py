@@ -42,8 +42,8 @@ def equip_form(bot, ievent):
 
 @expose('guida')
 def guida(bot, ievent):
-    if ievent.channel.lower() not in ['#reclute-war', '#accademia-ei', '#erep-war', '#ei-tech']:
-        return
+#    if ievent.channel.lower() not in ['#reclute-war', '#accademia-ei', '#erep-war', '#ei-tech']:
+#        return
 
     topics = [
         'organizzazione',
@@ -55,6 +55,7 @@ def guida(bot, ievent):
         'dovespostarsi',
         'do',
         'mercenari',
+        'battaglie',
     ]
     nick = ievent.nick
     if len(ievent.args) == 0:
@@ -102,6 +103,9 @@ def guida(bot, ievent):
         elif topic == 'mercenari':
             title = 'Un colpo di bazooka e un #mercenaries'
             url = 'http://www.erepublik.com/it/article/2280072/1/20'
+        elif topic == 'battaglie':
+            title = 'Battaglie'
+            url = 'http://www.erepublik.com/it/article/2063750/1/20'
 
         bot.msg(
             choose_dest(ievent),
