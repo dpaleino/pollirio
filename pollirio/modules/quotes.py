@@ -35,7 +35,7 @@ class QuotesDb:
 
     def add(self, quote):
         rs = run(self.db.insert({'quote': unicode(quote, 'utf-8')}))
-        return rs.last_inserted_ids()[0]
+        return rs.inserted_primary_key
 
     def delete(self, id):
         if run(self.db.select(self.db.c.indx == id)).fetchone():
