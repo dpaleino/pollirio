@@ -336,6 +336,19 @@ def rankup(bot, ievent):
 
     bot.msg(choose_dest(ievent), msg)
 
+@expose('avatar')
+def avatar(bot, ievent):
+    if len(ievent.args) == 0:
+        user = ievent.nick
+    else:
+        user = ' '.join(ievent.args)
+    user_id = get_uid(bot, ievent, user)
+    if not user_id:
+        return
+    profile = request('citizen', 'profile', citizenId=user_id)
+    avatar = profile['general']['avatar'].replace('\\/', '/')
+    bot.msg(choose_dest(ievent), '%s: %s' % (ievent.nick, avatar))
+
 @expose('party', 1)
 def party(bot, ievent):
     '''party <abbreviazione partito>'''
