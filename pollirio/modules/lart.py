@@ -35,7 +35,7 @@ class LartsDb:
 
     def add(self, lart):
         rs = run(self.db.insert({"lart": unicode(lart, 'utf-8')}))
-        return rs.last_inserted_ids()[0]
+        return rs.inserted_primary_key
 
     def delete(self, id):
         if run(self.db.select(self.db.c.indx == id)).fetchone():
@@ -58,7 +58,7 @@ class LartIgnoreDb:
 
     def add(self, src, dst):
         rs = run(self.db.insert({"src": src, "dst": dst}))
-        return rs.last_inserted_ids()[0]
+        return rs.inserted_primary_key
 
     def delete(self, src, dst):
         r = run(self.db.delete().where(and_( \

@@ -35,7 +35,7 @@ class PerleDb:
 
     def add(self, perla):
         rs = run(self.db.insert({'perla': unicode(perla, 'utf-8')}))
-        return rs.last_inserted_ids()[0]
+        return rs.inserted_primary_key
 
     def delete(self, id):
         if run(self.db.select(self.db.c.indx == id)).fetchone():

@@ -31,7 +31,7 @@ class UsersDb:
             'username': unicode(username, 'utf-8'),
             'user_id': str(int(user_id))
         }))
-        return rs.last_inserted_ids()[0]
+        return rs.inserted_primary_key
 
 users = UsersDb()
 
