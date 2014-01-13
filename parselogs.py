@@ -120,6 +120,7 @@ print """<html>
 <body>
 <table border='1'>
 <thead>
+<caption>Ultimo aggiornamento: %s</caption>
 <tr>
 <th>Ufficiale</th>
 <th>#Accademia-EI</th>
@@ -128,7 +129,7 @@ print """<html>
 <th>#ufficiali</th>
 </tr>
 </thead>
-<tbody>"""
+<tbody>""" % time.strftime("%d/%m/%Y %H:%M:%S", time.localtime(time.time()))
 
 for officer in sorted(stats.keys(), key=lambda x: x.lower()):
     print """<tr>
