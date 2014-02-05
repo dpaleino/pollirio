@@ -34,7 +34,7 @@ def lavoro(bot, ievent):
 
 @expose('equip')
 def equip(bot, ievent):
-    reclute_link(bot, ievent, 'http://tinyurl.com/EIequip041213')
+    reclute_link(bot, ievent, 'http://tinyurl.com/EI-equip040214')
 
 @expose('equipform')
 def equip_form(bot, ievent):
