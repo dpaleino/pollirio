@@ -197,6 +197,11 @@ class MyBot(irc.IRCClient):
     def userQuit(self, user, msg):
         """Called when I see another user disconnect from the network."""
         self.loggers['server'].log("-!- %s has quit (%s)" % (user, msg))
+        for channel in self.userlist.keys():
+            try:
+                del self.userlist[channel][user]
+            except KeyError:
+                pass
 
     # callback
     def kickedFrom(self, channel, kicker, message):

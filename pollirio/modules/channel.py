@@ -8,7 +8,6 @@ from pollirio import conf
 def mass(bot, ievent, msg=None):
     if ievent.channel == conf.nickname:
         return
-    bot.sendLine('WHO %s' % ievent.channel)
     modes = bot.userlist[ievent.channel.lower()][ievent.nick]
     if '~' in modes or \
       '&' in modes or \
