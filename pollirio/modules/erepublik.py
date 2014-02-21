@@ -188,13 +188,15 @@ def get_uid(bot, ievent, user):
         bot.msg(choose_dest(ievent), '%s: utente «%s» non trovato.' % (ievent.nick, user))
         return None
 
-def get_hit(strength, rank_points):
+def get_hit(strength, rank_points, elite=False):
     level = 0
     for points in sorted(list(rankings.keys())):
         if points > int(rank_points):
             break
         level += 1
     base_hit = 10 * (1 + float(strength) / 400.0) * (1 + level / 5.0)
+    if elite:
+        base_hit *= 1.1
     return int(round(base_hit))
 
 @expose('lp')
@@ -256,7 +258,8 @@ def fight_calc(bot, ievent):
     if not user_id:
         return
     profile = request('citizen', 'profile', citizenId=user_id)
-    hit = get_hit(profile['militaryAttributes']['strength'], profile['militaryAttributes']['rank_points'])
+    elite = int(profile['general']['level']) >= 101
+    hit = get_hit(profile['militaryAttributes']['strength'], profile['militaryAttributes']['rank_points'], elite)
     bot.msg(
         choose_dest(ievent),
         '%s: Inf Q0: \x02%s\x0F :: Q1: \x02%s\x0F :: Q2: \x02%s\x0F :: Q3: \x02%s\x0F :: Q4: \x02%s\x0F :: Q5: \x02%s\x0F :: Q6: \x02%s\x0F :: Q7: \x02%s\x0F' % \
@@ -326,7 +329,8 @@ def rankup(bot, ievent):
     next_rank = rankings[next_rank_inf]
     req_inf = (next_rank_inf - int(profile['militaryAttributes']['rank_points'])) * 10
 
-    hit = get_hit(profile['militaryAttributes']['strength'], profile['militaryAttributes']['rank_points'])
+    elite = int(profile['general']['level']) >= 101
+    hit = get_hit(profile['militaryAttributes']['strength'], profile['militaryAttributes']['rank_points'], elite)
     hit_q0 = int(req_inf / hit)
 
     msg = 'Prossimo rank per %s: \x02%s\x0F :: Inf richiesta: %d :: Q0: \x02%s\x0F :: Q1: \x02%s\x0F :: Q2: \x02%s\x0F :: Q3: \x02%s\x0F :: Q4: \x02%s\x0F :: Q5: \x02%s\x0F :: Q6: \x02%s\x0F :: Q7: \x02%s\x0F' % \
