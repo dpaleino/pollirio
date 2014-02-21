@@ -216,6 +216,13 @@ def list_profile(bot, ievent):
     if not profile['militaryUnit']:
         profile['militaryUnit'] = {'name': 'Nessuna MU'}
 
+    # fix for missing Titan(***) in the API
+    rank_inf = 0
+    for inf in sorted(rankings.keys()):
+        if inf <= int(profile['militaryAttributes']['rank_points']):
+            rank_inf = inf
+    rank = rankings[rank_inf]
+
     bot.msg(
         choose_dest(ievent),
         '\x02ID:\x0F %s ' \
@@ -236,7 +243,7 @@ def list_profile(bot, ievent):
             age.days,
             profile['general']['experience_points'],
             profile['militaryAttributes']['strength'],
-            profile['militaryAttributes']['rank_name'] + '*'*profile['militaryAttributes']['rank_stars'],
+            rank,
             profile['militaryAttributes']['rank_points'],
             profile['general']['nationalRank'],
             profile['location']['citizenship_country_initials'],
