@@ -6,7 +6,7 @@ from pollirio import choose_dest
 from pollirio import conf
 from erepublik import get_uid
 
-def reclute_link(bot, ievent, link):
+def limited_message(bot, ievent):
     if ievent.channel.lower() not in ['#reclute-war', '#accademia-ei', '#erep-war']:
         return
 
@@ -17,11 +17,29 @@ def reclute_link(bot, ievent, link):
       '@' in modes or \
       '%' in modes or \
       ievent.nick == 'dapal':
+        return True
+    return False
+
+def reclute_link(bot, ievent, link):
+    if limited_message(bot, ievent):
         if len(ievent.args):
             nick = ievent.args[0]
         else:
             nick = ievent.nick
         bot.msg(choose_dest(ievent), '%s: %s' % (nick, link))
+    return
+
+@expose('soldati')
+def soldati(bot, ievent):
+    channels = ['#accademia-ei', '#erep-war']
+    if ievent.channel.lower() not in channels:
+        return
+
+    if limited_message(bot, ievent):
+        args = ievent.msg.split(' ', 1)
+        msg = args[1]
+        for ch in channels:
+            bot.msg(ch, 'Soldati! \x02%s\x0F' % msg)
     return
 
 @expose('arruola')
