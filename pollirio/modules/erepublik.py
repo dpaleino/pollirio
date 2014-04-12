@@ -306,6 +306,17 @@ def money(bot, ievent):
         return
     bot.msg(choose_dest(ievent), '%s: http://www.erepublik.com/en/economy/donate-money/%s' % (ievent.nick, user_id))
 
+@expose('message')
+def message(bot, ievent):
+    if len(ievent.args) == 0:
+        user = ievent.nick
+    else:
+        user = ' '.join(ievent.args)
+    user_id = get_uid(bot, ievent, user)
+    if not user_id:
+        return
+    bot.msg(choose_dest(ievent), '%s: http://www.erepublik.com/en/main/messages-compose/%s' % (ievent.nick, user_id))
+
 @expose('egov')
 def egov_profile(bot, ievent):
     if len(ievent.args) == 0:
