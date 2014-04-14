@@ -443,6 +443,7 @@ def ordini(bot, ievent):
     else:
         # ordine = [(1, u'#ei-tech', u'Pvppa.', u'dapal', u'2014-04-14 22:44:40.767942')]
         _, _, message, issuer, when = ordine
+        issuer = issuer[:-1] + '|' + issuer[-1] # so that it doesn't ping the user
         message = '\x02%s\x0F (set by %s at %s)' % (message, issuer, when)
         bot.msg(choose_dest(ievent), message.encode('utf-8'))
     return
