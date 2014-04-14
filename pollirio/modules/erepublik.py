@@ -33,7 +33,25 @@ class UsersDb:
         }))
         return rs.inserted_primary_key
 
+class OrdersDb:
+    def __init__(self):
+        self.db = db_init('erep_orders')
+
+    def get_last(self, channel):
+        rs = run(self.db.select(self.db.c.channel.like('%s' % channel))).fetchall()
+        return rs
+
+    def add(self, channel, order, issuer, when):
+        rs = run(self.db.insert({
+            'channel': channel,
+            'message': unicode(order, 'utf-8'),
+            'issuer': unicode(issuer, 'utf-8'),
+            'datetime': when,
+        }))
+        return rs.inserted_primary_key
+
 users = UsersDb()
+orders = OrdersDb()
 
 private = conf.config.get('erepublik', 'api_private')
 public = conf.config.get('erepublik', 'api_public')
@@ -411,5 +429,37 @@ def party(bot, ievent):
             #party['congress']['members']
         #)
     #)
+
+@expose('orders')
+@expose('ordini')
+def ordini(bot, ievent):
+    from pprint import pprint
+    ordine = orders.get_last(ievent.channel.lower())[0]
+    #pprint(ordine)
+    if not ordine:
+        bot.msg(choose_dest(ievent), '\x02Nessun ordine attivo.\x0F')
+    else:
+        # ordine = [(1, u'#ei-tech', u'Pvppa.', u'dapal', u'2014-04-14 22:44:40.767942')]
+        _, _, message, issuer, when = ordine
+        message = '\x02%s\x0F (set by %s at %s)' % (message, issuer, when)
+        bot.msg(choose_dest(ievent), message.encode('utf-8'))
+    return
+
+@expose('nuoviordini', 1)
+@expose('setorders', 1)
+@expose('neworders', 1)
+def nuoviordini(bot, ievent):
+    args = ievent.msg.split(" ", 1)
+    bot.sendLine('WHO %s' % ievent.channel)
+    modes = bot.userlist[ievent.channel.lower()][ievent.nick]
+    if '~' in modes or \
+      '&' in modes or \
+      '@' in modes or \
+      ievent.nick == 'dapal':
+        #def add(self, channel, order, issuer, when):
+        now = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        id = orders.add(ievent.channel.lower(), args[1], ievent.nick, now)
+        bot.msg(choose_dest(ievent), "%s: ordini aggiornati! o>" % ievent.nick)
+    return
 
 ## https://docs.google.com/document/pub?id=1WYgNCGj-TO0e0PJU4j_Pl9gjbgs70O5Glt3x-7XMg3A
