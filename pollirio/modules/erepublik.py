@@ -38,7 +38,9 @@ class OrdersDb:
         self.db = db_init('erep_orders')
 
     def get_last(self, channel):
-        rs = run(self.db.select(self.db.c.channel.like('%s' % channel))).fetchall()
+        query = self.db.select(self.db.c.channel.like('%s' % channel))
+        query = query.order_by(self.db.c.id.desc())
+        rs = run(query).fetchall()
         return rs
 
     def add(self, channel, order, issuer, when):
