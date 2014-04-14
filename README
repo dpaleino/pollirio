@@ -4,3 +4,6 @@ Pollirio -- IRC bot for #debian-it on Freenode
 Just a simple, home-made bot.
 
 To report bugs/requests/whatever, please read BUGS.
+
+Please read the LICENSE file to know what you can do with this code.
+Its contents override any statement contained in the single files.
