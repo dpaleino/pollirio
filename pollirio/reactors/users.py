@@ -17,6 +17,14 @@ def randomize_msg(sentences):
 def mappina(bot, ievent):
     bot.msg(choose_dest(ievent), 'aaaaah, la STREGA!')
 
+@expose('vabbè')
+@expose('vabbé')
+@expose('vabbe')
+@expose('va beh')
+@expose('vabbeh')
+def vabbe(bot, ievent):
+    bot.msg(choose_dest(ievent), '%s: E vbb.' % ievent.nick)
+
 @expose('linxys')
 def linxys(bot, ievent):
     sentences = [
