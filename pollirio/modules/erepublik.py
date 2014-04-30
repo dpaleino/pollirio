@@ -219,6 +219,22 @@ def get_hit(strength, rank_points, elite=False):
         base_hit *= 1.1
     return int(round(base_hit))
 
+@expose('reg_nick', 1)
+def reg_nick(bot, ievent):
+    '''.reg_nick <id> [nickname]'''
+    uid = ievent.args[0]
+    if len(ievent.args) == 1:
+        user = ievent.nick
+    else:
+        user = ievent.args[1]
+    print uid, user
+    ret = users.search(user)
+    if ret:
+        bot.msg(choose_dest(ievent), '%s: utente già esistente.' % ievent.nick)
+    else:
+        users.add(user, uid)
+        bot.msg(choose_dest(ievent), '%s: utente aggiunto.' % ievent.nick)
+
 @expose('lp')
 def list_profile(bot, ievent):
     if len(ievent.args) == 0:
