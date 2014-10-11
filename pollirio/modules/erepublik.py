@@ -146,8 +146,8 @@ def login():
     return s
 
 def request(resource, action, **args):
-    #oldlocale = locale.getlocale()
-    #locale.setlocale(locale.LC_ALL, 'C')
+    oldlocale = locale.getlocale()
+    locale.setlocale(locale.LC_ALL, 'C')
 
     date = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S')
     params = None
@@ -157,12 +157,18 @@ def request(resource, action, **args):
     query = ':'.join([x for x in [resource, action, params, date] if x is not None])
     auth = hmac.new(private, query, hashlib.sha256).hexdigest()
 
-    s = session()
-    headers = {
-        'Date': date,
-        'Auth': '%s/%s' % (public, auth),
-    }
-    page = s.get('http://api.erepublik.com/citizen/profile', params=args, headers=headers)
+    with session() as s:
+        headers = {
+            'Date': date,
+            'Auth': '%s/%s' % (public, auth),
+        }
+        page = s.get(
+            'http://api.erepublik.com/%s/%s' % (resource, action),
+            params=args,
+            headers=headers
+        )
+
+    locale.setlocale(locale.LC_ALL, oldlocale)
     #pprint(json.decode(page.text))
     return json.decode(page.text)['message']
 
