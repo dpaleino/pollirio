@@ -184,6 +184,44 @@ def scrape(resource, **args):
         doc = fromstring(search.text)
         uid = doc.xpath('//div[@class="nameholder"]/a/@href')[0].split('/')[-1].strip()
         return uid
+    elif resource == 'citizen.profile':
+        profile = session.get(
+            'http://www.erepublik.com/en/citizen/profile/%s' % args['citizenId']
+        )
+        doc = fromstring(profile.text)
+
+        citizen_state = doc.xpath('//div[@class="citizen_state"]/div[@class="is"]/span/img/@src')
+        is_dead = citizen_state and 'dead_citizen' in citizen_state[0]
+
+        profile = {
+            'general': {
+                'avatar': doc.xpath('//img[@class="citizen_avatar"]/@style')[0].split('(')[1].split(')')[0],
+                'level': doc.xpath('//*[@class="citizen_level"]')[0].text,
+                'experience_points': doc.xpath('//*[@class="citizen_experience"]/div/p')[0].text.split(' / ')[0].replace(',', ''),
+                'name': doc.xpath('//*[@class="citizen_profile_header auth"]/h2')[0].text_content().strip(),
+                'is_alive': str(int(not is_dead)),
+                'birthDay': doc.xpath('//div[@class="citizen_second"]/p')[1].text.strip(),
+                'nationalRank': doc.xpath('//div[@class="citizen_second"]/small/strong')[0].text,
+
+            },
+            'location': {
+                'citizenship_country_initials': doc.xpath('//div[contains(@class, "citizen_info")]/a/@href')[2].split('/')[-1],
+                'residence_country_name': doc.xpath('//div[contains(@class, "citizen_info")]/a/@title')[0],
+                'residence_region_name': doc.xpath('//div[contains(@class, "citizen_info")]/a/@title')[1],
+            },
+            'party': {
+                'name': doc.xpath('//div[@class="citizen_activity"]/div/div/span/a')[0].text.strip(),
+            },
+            'militaryUnit': {
+                'id': doc.xpath('//div[@class="citizen_activity"]/div/div/a/@href')[0].split('/')[-1],
+                'name': doc.xpath('//div[@class="citizen_activity"]/div/div/a/span')[0].text.strip(),
+            },
+            'militaryAttributes': {
+                'strength': doc.xpath('//div[@class="citizen_military"]/h4')[0].text.replace(',', '').strip(),
+                'rank_points': doc.xpath('//div[@class="stat"]/small/strong')[1].text.split(' / ')[0].replace(',', ''),
+            },
+        }
+        return profile
 
     #patterns = {
         #'citizen.profile': 'citizen/profile/%(id)d',
@@ -250,13 +288,13 @@ def list_profile(bot, ievent):
     user_id = get_uid(bot, ievent, user)
     if not user_id:
         return
-    profile = request('citizen', 'profile', citizenId=user_id)
+    profile = scrape('citizen.profile', citizenId=user_id)
     age = datetime.now() - datetime.strptime(profile['general']['birthDay'], '%b %d, %Y')
 
-    if not profile['party']:
-        profile['party'] = {'name': 'Nessun partito'}
+    if not profile['party']['name']:
+        profile['party']['name'] = 'Nessun partito'
     if not profile['militaryUnit']:
-        profile['militaryUnit'] = {'name': 'Nessuna MU'}
+        profile['militaryUnit']['name'] = 'Nessuna MU'
 
     # fix for missing Titan(***) in the API
     rank_inf = 0
@@ -306,7 +344,7 @@ def fight_calc(bot, ievent):
     user_id = get_uid(bot, ievent, user)
     if not user_id:
         return
-    profile = request('citizen', 'profile', citizenId=user_id)
+    profile = scrape('citizen.profile', citizenId=user_id)
     elite = int(profile['general']['level']) >= 101
     hit = get_hit(profile['militaryAttributes']['strength'], profile['militaryAttributes']['rank_points'], elite)
     bot.msg(
@@ -379,7 +417,7 @@ def rankup(bot, ievent):
     user_id = get_uid(bot, ievent, user)
     if not user_id:
         return
-    profile = request('citizen', 'profile', citizenId=user_id)
+    profile = scrape('citizen.profile', citizenId=user_id)
 
     next_rank_inf = 0
     for inf in sorted(rankings.keys()):
@@ -409,7 +447,7 @@ def avatar(bot, ievent):
     user_id = get_uid(bot, ievent, user)
     if not user_id:
         return
-    profile = request('citizen', 'profile', citizenId=user_id)
+    profile = scrape('citizen.profile', citizenId=user_id)
     avatar = profile['general']['avatar'].replace('\\/', '/')
     bot.msg(choose_dest(ievent), '%s: %s' % (ievent.nick, avatar))
 
